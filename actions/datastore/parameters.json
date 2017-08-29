@@ -1,0 +1,22 @@
+[
+  {
+    "name": "operation",
+    "required": true,
+    "description": "The operation which should be executed: create, read, update or list."
+  },
+  {
+    "name": "id",
+    "required": false,
+    "description": "The id of the document, required for read and update."
+  },
+  {
+    "name": "doc",
+    "reqired": false,
+    "description": "The document to be stored, required for create and update."
+  },
+  {
+    "name": "filter",
+    "required": false,
+    "description": "For list only. A key-value map including values for search."
+  }
+]

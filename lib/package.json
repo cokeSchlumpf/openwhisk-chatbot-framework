@@ -1,0 +1,18 @@
+{
+  "name": "openwhisk-chatbot-framework",
+  "version": "1.0.0",
+  "description": "A framework to build chatbots on the OpenWhisk platform.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha *.test.js"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "openwhisk": "^3.7.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0",
+    "mock-require": "^2.0.2"
+  }
+}
