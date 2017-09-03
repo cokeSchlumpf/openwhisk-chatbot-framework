@@ -11,8 +11,10 @@
     "openwhisk": "^3.7.0"
   },
   "devDependencies": {
+    "acquit": "^0.5.0",
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
-    "mock-require": "^2.0.2"
+    "mock-require": "^2.0.2",
+    "sinon": "^3.2.1"
   }
 }

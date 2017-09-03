@@ -66,11 +66,11 @@ const read = (db, params) => {
       .then(result => _.get(result, 'docs', []))
       .then(success())
       .catch(error('Cannot execute search')));
-  } else if (params._id) {
+  } else if (params.id) {
     const validator = new Validator();
 
     validator(params).required().isObject(obj => {
-      obj('_id').required().isString();
+      obj('id').required().isString();
     });
 
     return validate(validator, () => db
@@ -118,15 +118,16 @@ const remove = (db, params) => {
   const validator = new Validator();
 
   validator(params).required().isObject(obj => {
-    obj('_id').required().isString();
+    obj('id').required().isString();
+    obj('rev').isString();
   });
 
   let doc;
 
-  if (!params._rev) {
-    doc = db.get(params._id);
+  if (!params.rev) {
+    doc = db.get(params.id);
   } else {
-    doc = Promise.resolve(params);
+    doc = Promise.resolve({ _id: params.id, _rev: params.rev });
   }
 
   return doc
