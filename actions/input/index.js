@@ -2,36 +2,34 @@ const _ = require('lodash');
 const openwhisk = require('openwhisk');
 const routes = require('openwhisk-routes');
 const Validator = require('better-validator');
+const uuid = require('uuid/v4');
 
 const processError = (res) => (error) => {
   if (!_.isUndefined(error) && error.error && error.error.message) {
     res.status(error.statusCode || 500).send(error.error);
   } else {
+    console.log(error);
     res.sendStatus(500);
   }
 }
 
-const processMiddleware = (ow, payload, middlewares) => {
-  const middleware = _.first(middlewares);
-  const remaining = _.tail(middlewares);
-
-  if (middleware) {
-    
-  } else {
-    // TODO: Log Done
-  }
-}
-
-const processRequest = (ow, request, connectors) => {
+const processRequest = (ow, request, connectors, config, payloadId = uuid()) => {
   const connector = _.first(connectors);
   const remaining = _.tail(connectors);
 
   if (connector) {
+    const payload = {
+      id: payloadId,
+      input: {
+        channel: connector.channel
+      }
+    }
+
     const invokeParams = {
       name: connector.action,
       blocking: true,
       result: true,
-      params: _.assign({}, { request }, connector.parameters || {})
+      params: _.assign({}, { request, payload }, connector.parameters || {})
     };
 
     return ow.actions.invoke(invokeParams)
@@ -48,7 +46,14 @@ const processRequest = (ow, request, connectors) => {
         if (_.size(errors) === 0) {
           if (result.statusCode === 200) {
             validator(result).required().isObject(obj => {
-              obj('payload').required().isObject(); // TODO, do further validation on payload
+              obj('payload').required().isObject(obj => {
+                obj('id').required().isString();
+                obj('input').required().isObject(obj => {
+                  obj('channel').required().isString();
+                  obj('userId').required().isString();
+                  obj('message').required();
+                });
+              });
               obj('response').required().isObject(obj => {
                 obj('statusCode').required().isNumber().integer();
                 obj('body').isObject();
@@ -58,7 +63,14 @@ const processRequest = (ow, request, connectors) => {
             errors = validator.run();
 
             if (_.size(errors) === 0) {
-              return result;
+              const invokeParams = {
+                name: `${_.get(config, 'openwhisk.package')}/middleware`,
+                params: { payload }
+              };
+
+              return ow
+                .actions.invoke(invokeParams)
+                .then(res => result);
             } else {
               return Promise.reject({
                 statusCode: 503,
@@ -73,7 +85,7 @@ const processRequest = (ow, request, connectors) => {
             }
           } else if (result.statusCode === 422) {
             // Input Connector did not recognize this input, try the next one.
-            return processRequest(ow, request, remaining);
+            return processRequest(ow, request, remaining, config, payloadId);
           } else {
             return Promise.reject({
               statusCode: 503,
@@ -122,9 +134,10 @@ const processResponse = (res) => (connectorResponse) => {
 exports.main = routes(action => {
   action.all('/', (req, res) => {
     const request = _.pick(req, 'body', 'url', 'headers', 'method', 'query');
-    const connectors = _.get(req.wsk, 'config.connectors.input', []);
+    const connectors = _.get(req, 'wsk.config.connectors.input', []);
+    const config = _.get(req, 'wsk.config', {});
 
-    processRequest(openwhisk(), request, connectors)
+    processRequest(openwhisk(), request, connectors, config)
       .then(processResponse(res))
       .catch(processError(res));
   });

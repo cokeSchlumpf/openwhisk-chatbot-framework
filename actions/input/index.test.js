@@ -21,13 +21,19 @@ describe('input', () => {
       .onCall(1).returns(Promise.resolve({
         statusCode: 200,
         payload: {
-          foo: 'bar'
+          id: '12345',
+          input: {
+            channel: 'testchannel',
+            userId: 'foo',
+            message: 'lorem ipsum'
+          }
         },
         response: {
           statusCode: 200,
           body: { ok: 'ok' }
         }
-      }));
+      }))
+      .onCall(2).returns(Promise.resolve());
 
     // mock openwhisk action calls to return successful results
     requireMock('openwhisk', () => ({
@@ -56,6 +62,9 @@ describe('input', () => {
             parameters: {}
           }
         ]
+      },
+      openwhisk: {
+        package: 'testpackage'
       }
     }
 
@@ -64,6 +73,7 @@ describe('input', () => {
         chai.expect(result.statusCode).to.equal(200);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
         chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.input[1].action);
+        chai.expect(invokeStub.getCall(2).args[0].name).to.equal(`${config.openwhisk.package}/middleware`);
       });
   });
 
@@ -73,7 +83,12 @@ describe('input', () => {
       .returns(Promise.resolve({
         statusCode: 200,
         payload: {
-          foo: 'bar'
+          id: '12345',
+          input: {
+            channel: 'testchannel',
+            userId: 'foo',
+            message: 'lorem ipsum'
+          }
         },
         response: {
           statusCode: 200
@@ -97,6 +112,9 @@ describe('input', () => {
             parameters: {}
           }
         ]
+      },
+      openwhisk: {
+        package: 'testpackage'
       }
     }
 
@@ -104,6 +122,7 @@ describe('input', () => {
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(`${config.openwhisk.package}/middleware`);
       });
   });
 
