@@ -10,11 +10,11 @@
   "dependencies": {
     "better-validator": "^2.1.3",
     "lodash": "^4.17.4",
-    "openwhisk-chatbot-framework": "^1.0.2"
+    "openwhisk-chatbot-framework": "^1.0.4"
   },
   "devDependencies": {
     "acquit": "^0.5.0",
-    "chai": "^4.1.1",
+    "chai": "^4.1.2",
     "mocha": "^3.5.0",
     "mock-require": "^2.0.2",
     "sinon": "^3.2.1"

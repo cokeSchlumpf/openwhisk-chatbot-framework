@@ -31,7 +31,8 @@ exports.main = (params) => {
             user: _.get(params, 'payload.conversationcontext.user.id'),
             payload: _.get(params, 'payload.id'),
             level: params.level,
-            message: params.message
+            message: params.message,
+            timestamp: Date.now() / 1000 | 0
           })
           .then(result => ({
             statusCode: 200,

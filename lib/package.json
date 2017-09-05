@@ -1,6 +1,6 @@
 {
   "name": "openwhisk-chatbot-framework",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A framework to build chatbots on the OpenWhisk platform. This is a util library of the framework.",
   "main": "index.js",
   "scripts": {
