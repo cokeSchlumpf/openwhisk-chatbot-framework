@@ -3,8 +3,9 @@ const openwhisk = require('openwhisk');
 const routes = require('openwhisk-routes');
 const Validator = require('better-validator');
 const uuid = require('uuid/v4');
+const wskbotfwk = require('openwhisk-chatbot-framework');
 
-const processError = (res) => (error) => {
+const processError = (res, bot) => (error) => {
   if (!_.isUndefined(error) && error.error && error.error.message) {
     res.status(error.statusCode || 500).send(error.error);
   } else {
@@ -132,6 +133,8 @@ const processResponse = (res) => (connectorResponse) => {
 }
 
 exports.main = routes(action => {
+  const bot = wskbotfwk(params);
+
   action.all('/', (req, res) => {
     const request = _.pick(req, 'body', 'url', 'headers', 'method', 'query');
     const connectors = _.get(req, 'wsk.config.connectors.input', []);
@@ -139,6 +142,6 @@ exports.main = routes(action => {
 
     processRequest(openwhisk(), request, connectors, config)
       .then(processResponse(res))
-      .catch(processError(res));
+      .catch(processError(res, bot));
   });
 });

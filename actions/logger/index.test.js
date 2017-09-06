@@ -182,10 +182,7 @@ describe('logger', () => {
 
     return requireMock.reRequire('./index').main(params)
       .then(result => {
-        chai.expect(true).to.be.false;
-      })
-      .catch(error => {
-        chai.expect(error.statusCode).to.equal(400);
+        chai.expect(result.statusCode).to.equal(400);
       });
   });
 });
