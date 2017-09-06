@@ -45,7 +45,7 @@ describe('logger', () => {
       config
     };
 
-    requireMock.reRequire('openwhisk-chatbot-framework');
+    requireMock.reRequire('serverless-botpack-lib');
     requireMock.reRequire('openwhisk');
 
     return requireMock.reRequire('./index').main(params)
@@ -90,7 +90,7 @@ describe('logger', () => {
       config
     };
 
-    requireMock.reRequire('openwhisk-chatbot-framework');
+    requireMock.reRequire('serverless-botpack-lib');
     requireMock.reRequire('openwhisk');
 
     return requireMock.reRequire('./index').main(params)
@@ -141,7 +141,7 @@ describe('logger', () => {
       config
     };
 
-    requireMock.reRequire('openwhisk-chatbot-framework');
+    requireMock.reRequire('serverless-botpack-lib');
     requireMock.reRequire('openwhisk');
 
     return requireMock.reRequire('./index').main(params)

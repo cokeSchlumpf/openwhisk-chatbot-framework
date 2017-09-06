@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const wskbotfwk = require('openwhisk-chatbot-framework');
+const wskbotfwk = require('serverless-botpack-lib');
 const Validator = require('better-validator');
 
 const LEVELS = ['DEBUG', 'INFO', 'WARN', 'ERROR'];

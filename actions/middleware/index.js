@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const openwhisk = require('openwhisk');
 const Validator = require('better-validator');
-const wskbotfwk = require('openwhisk-chatbot-framework');
+const wskbotfwk = require('serverless-botpack-lib');
 
 exports.main = (params) => {
   const ow = openwhisk();

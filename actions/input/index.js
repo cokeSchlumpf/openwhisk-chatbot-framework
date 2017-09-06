@@ -3,7 +3,7 @@ const openwhisk = require('openwhisk');
 const routes = require('openwhisk-routes');
 const Validator = require('better-validator');
 const uuid = require('uuid/v4');
-const wskbotfwk = require('openwhisk-chatbot-framework');
+const wskbotfwk = require('serverless-botpack-lib');
 
 const processError = (res, bot) => (error) => {
   if (!_.isUndefined(error) && error.error && error.error.message) {
@@ -133,9 +133,8 @@ const processResponse = (res) => (connectorResponse) => {
 }
 
 exports.main = routes(action => {
-  const bot = wskbotfwk(params);
-
   action.all('/', (req, res) => {
+    const bot = wskbotfwk(_.get(req, 'wsk', {}));
     const request = _.pick(req, 'body', 'url', 'headers', 'method', 'query');
     const connectors = _.get(req, 'wsk.config.connectors.input', []);
     const config = _.get(req, 'wsk.config', {});

@@ -4,8 +4,6 @@ const requireMock = require('mock-require');
 
 const isBluemix = false;
 
-const cloudantMock = require('mock-cloudant');
-
 const expect = chai.expect;
 const config = {
   "cloudant": {
@@ -13,8 +11,6 @@ const config = {
     "url": "https://b33e09bd-c08b-4b6f-a6f3-79f121d38be2-bluemix:0d912b22354de5014c1b3cb33c7371bbfecf60b1aca59562792263eafd7b5988@b33e09bd-c08b-4b6f-a6f3-79f121d38be2-bluemix.cloudant.com"
   }
 }
-
-let cloudantMockServer;
 
 const debug = (result) => {
   console.log(JSON.stringify(result, null, 2));
