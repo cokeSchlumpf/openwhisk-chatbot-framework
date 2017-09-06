@@ -17,8 +17,19 @@ describe('middleware', () => {
     const invokeStub = sinon.stub()
       .returns(Promise.resolve({
         statusCode: 200,
-        input: {
-          channel: 'facebook'
+        payload: {
+          id: '123',
+          input: {
+            channel: 'facebook',
+            user: '1234',
+            message: 'foo'
+          },
+          conversationcontext: {
+            user: {
+              id: '1234',
+              'facebook_id': '123456'
+            }
+          }
         }
       }));
 
@@ -42,8 +53,11 @@ describe('middleware', () => {
     }
 
     const payload = {
+      id: '12345',
       input: {
-        channel: 'facebook'
+        channel: 'facebook',
+        user: '1234',
+        message: 'foo'
       }
     }
 
@@ -58,8 +72,13 @@ describe('middleware', () => {
     const invokeStub = sinon.stub()
       .onCall(0).returns(Promise.resolve({
         statusCode: 301,
-        input: {
-          channel: 'facebook'
+        payload: {
+          id: '123',
+          input: {
+            channel: 'facebook',
+            user: '1234',
+            message: 'foo'
+          }
         }
       }));
 
@@ -83,8 +102,11 @@ describe('middleware', () => {
     }
 
     const payload = {
+      id: '123',
       input: {
-        channel: 'facebook'
+        channel: 'facebook',
+        user: '1234',
+        message: 'foo'
       }
     }
 
@@ -99,11 +121,16 @@ describe('middleware', () => {
     const invokeStub = sinon.stub()
       .onCall(0).returns(Promise.resolve({
         statusCode: 200,
-        input: {
-          channel: 'facebook'
+        payload: {
+          id: '1234',
+          input: {
+            channel: 'facebook',
+            user: '1234',
+            message: 'foo'
+          }
         }
       }))
-      .onCall(1).returns(Promise.resolve({ }));
+      .onCall(1).returns(Promise.resolve({}));
 
     // mock openwhisk action calls to return successful results
     requireMock('openwhisk', () => ({
@@ -125,8 +152,11 @@ describe('middleware', () => {
     }
 
     const payload = {
+      id: '1234',
       input: {
-        channel: 'facebook'
+        channel: 'facebook',
+        user: '1234',
+        message: 'foo'
       }
     }
 

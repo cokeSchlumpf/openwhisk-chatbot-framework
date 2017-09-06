@@ -10,7 +10,7 @@ exports.main = (params) => {
   const middlewares = _.get(params, 'config.middleware', []);
   const payload = _.get(params, 'payload');
 
-  const checkPayload = (origin) => (payload) => {
+  const checkPayload = (payload, origin) => {
     return bot.util
       .validatePayload(payload, 'INPUT')
       .catch(error => Promise.reject({
@@ -19,13 +19,13 @@ exports.main = (params) => {
           message: origin ? `The payload returned by '${origin}' is not valid.` : 'The payload is not valid.',
           parameters: {
             payload,
-            validationErrors: errors
+            validationErrors: error
           }
         }
       }));
   }
 
-  const processMiddleware = (ow, middlewares) => (payload) => {
+  const processMiddleware = (ow, middlewares, payload) => {
     const middleware = _.first(middlewares);
     const remaining = _.tail(middlewares);
 
@@ -38,21 +38,25 @@ exports.main = (params) => {
       };
 
       return ow.actions.invoke(invokeParams)
-        .then(checkPayload(middleware.action))
-        .then(payload => {
-          if (payload.statusCode !== 200) {
-            return Promise.resolve([middleware.action]);
-          } else {
-            return processMiddleware(ow, remaining)(payload)
-              .then(result => _.concat([middleware.action], result));
-          }
+        .then(result => {
+          const payload = _.get(result, 'payload');
+          
+          return checkPayload(payload, middleware.action)
+            .then(() => {
+              if (result.statusCode !== 200) {
+                return Promise.resolve([middleware.action]);
+              } else {
+                return processMiddleware(ow, remaining, payload)
+                  .then(result => _.concat([middleware.action], result));
+              }
+            })
         });
     } else {
       return Promise.resolve([]);
     }
   }
 
-  return checkPayload()(payload)
-    .then(processMiddleware(ow, middlewares))
+  return checkPayload(payload)
+    .then(() => processMiddleware(ow, middlewares, payload))
     .catch(bot.util.defaultErrorHandler);
 };
