@@ -63,7 +63,7 @@ describe('middleware', () => {
 
     return requireMock.reRequire('./index').main({ payload, config })
       .then(result => {
-        chai.expect(result).to.have.lengthOf(2);
+        chai.expect(result.result).to.have.lengthOf(2);
       });
   });
 
@@ -112,7 +112,7 @@ describe('middleware', () => {
 
     return requireMock.reRequire('./index').main({ payload, config })
       .then(result => {
-        chai.expect(result).to.have.lengthOf(1);
+        chai.expect(result.result).to.have.lengthOf(1);
       });
   });
 

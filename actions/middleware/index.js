@@ -25,7 +25,27 @@ exports.main = (params) => {
       }));
   }
 
-  const processMiddleware = (ow, middlewares, payload) => {
+  const enrichPayload = (payload) => {
+    return bot.db
+      .read({ type: 'user', [`${payload.input.channel}_id`]: payload.input.user })
+      .then(results => {
+        if (_.size(results) > 0) { // we've found an existing user
+          return _.head(results);
+        } else { // no user found
+          const user = _.assign({}, {
+            type: 'user',
+            [`${payload.input.channel}_id`]: payload.input.user
+          }, _.pick(payload.input, 'profile'));
+          
+          return bot.db.create(user);
+        }
+      })
+      .then(user => {
+        return _.assign({}, payload, { conversationcontext: { user } });
+      });
+  }
+
+  const processMiddleware = (middlewares, payload) => {
     const middleware = _.first(middlewares);
     const remaining = _.tail(middlewares);
 
@@ -46,7 +66,7 @@ exports.main = (params) => {
               if (result.statusCode !== 200) {
                 return Promise.resolve([middleware.action]);
               } else {
-                return processMiddleware(ow, remaining, payload)
+                return processMiddleware(remaining, payload)
                   .then(result => _.concat([middleware.action], result));
               }
             })
@@ -57,6 +77,12 @@ exports.main = (params) => {
   }
 
   return checkPayload(payload)
-    .then(() => processMiddleware(ow, middlewares, payload))
-    .catch(bot.util.defaultErrorHandler);
+    .then(payload => enrichPayload(payload))
+    .then(payload => processMiddleware(middlewares, payload))
+    .then(result => ({
+      statusCode: 200,
+      result
+    }))
+    .then(bot.util.defaultAsyncResultHandler)
+    .catch(bot.util.defaultAsyncResultHandler);
 };
