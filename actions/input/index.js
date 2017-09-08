@@ -63,6 +63,8 @@ exports.main = routes(action => {
                 .then(() => {
                   const invokeParams = {
                     name: `${_.get(config, 'openwhisk.package')}/middleware`,
+                    blocking: false,
+                    result: false,
                     params: { payload: result.payload }
                   };
 

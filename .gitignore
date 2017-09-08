@@ -1,6 +1,6 @@
 # Project specific
 package.parameters.json
-serverless-botpack-lib/**
+serverless-botpack-lib
 
 # Logs
 logs
