@@ -11,7 +11,7 @@ const debug = (result) => {
 /* 
  * Some general notes ... 
  */
-describe('input', () => {
+describe('core-input', () => {
   it('returns the response of a input-connector if connector matches the request ...and calls the middleware processor', () => {
     // create stubs for actual functions
     const invokeStub = sinon.stub()
@@ -73,7 +73,7 @@ describe('input', () => {
         chai.expect(result.statusCode).to.equal(200);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
         chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.input[1].action);
-        chai.expect(invokeStub.getCall(2).args[0].name).to.equal(`${config.openwhisk.package}/middleware`);
+        chai.expect(invokeStub.getCall(2).args[0].name).to.equal(`${config.openwhisk.package}/core-middleware`);
         chai.expect(invokeStub.getCall(2).args[0].params.payload.id).to.equal('12345');
         chai.expect(invokeStub.getCall(2).args[0].params.payload.input.message).to.equal('lorem ipsum');
       });
@@ -124,7 +124,7 @@ describe('input', () => {
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
-        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(`${config.openwhisk.package}/middleware`);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(`${config.openwhisk.package}/core-middleware`);
       });
   });
 

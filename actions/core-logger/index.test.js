@@ -11,7 +11,7 @@ const debug = (result) => {
 /* 
  * Some general notes ... 
  */
-describe('logger', () => {
+describe('core-logger', () => {
   it('inserts log into the database', () => {
     // create stubs for actual functions
     const invokeStub = sinon.stub()

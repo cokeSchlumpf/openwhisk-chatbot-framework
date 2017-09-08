@@ -11,7 +11,7 @@ const debug = (result) => {
 /* 
  * Some general notes ... 
  */
-describe('middleware', () => {
+describe('core-middleware', () => {
   it('calls all configured middleware components', () => {
     // create stubs for actual functions
     const invokeStub = sinon.stub()

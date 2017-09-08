@@ -17,7 +17,7 @@ const debug = (result) => {
   return result;
 }
 
-describe('datastore', () => {
+describe('core-datastore', () => {
   const datastore = require('./index').main;
 
   describe('operation::create', () => {
