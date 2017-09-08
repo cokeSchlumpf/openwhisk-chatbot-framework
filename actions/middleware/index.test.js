@@ -240,7 +240,7 @@ describe('middleware', () => {
         result: []
       }))
       .onCall(1).returns(Promise.resolve({
-        statusCode: 200,
+        statusCode: 201,
         result: {
           type: 'user',
           _id: '123456789',

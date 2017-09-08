@@ -14,7 +14,7 @@
     "lodash": "^4.17.4",
     "openwhisk": "^3.7.0",
     "openwhisk-routes": "^1.0.8",
-    "serverless-botpack-lib": "^1.0.10",
+    "serverless-botpack-lib": "^1.0.11",
     "uuid": "^3.1.0"
   },
   "devDependencies": {
