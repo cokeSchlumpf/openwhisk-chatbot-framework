@@ -12,7 +12,7 @@ const debug = (result) => {
  * Some general notes ... 
  */
 describe('input', () => {
-  it('returns the response of a input-connector if connector matches the request', () => {
+  it('returns the response of a input-connector if connector matches the request ...and calls the middleware processor', () => {
     // create stubs for actual functions
     const invokeStub = sinon.stub()
       .onCall(0).returns(Promise.resolve({
@@ -24,7 +24,7 @@ describe('input', () => {
           id: '12345',
           input: {
             channel: 'testchannel',
-            userId: 'foo',
+            user: 'foo',
             message: 'lorem ipsum'
           }
         },
@@ -74,6 +74,8 @@ describe('input', () => {
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
         chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.input[1].action);
         chai.expect(invokeStub.getCall(2).args[0].name).to.equal(`${config.openwhisk.package}/middleware`);
+        chai.expect(invokeStub.getCall(2).args[0].params.payload.id).to.equal('12345');
+        chai.expect(invokeStub.getCall(2).args[0].params.payload.input.message).to.equal('lorem ipsum');
       });
   });
 
@@ -86,7 +88,7 @@ describe('input', () => {
           id: '12345',
           input: {
             channel: 'testchannel',
-            userId: 'foo',
+            user: 'foo',
             message: 'lorem ipsum'
           }
         },

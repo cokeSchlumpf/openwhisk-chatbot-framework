@@ -10,7 +10,7 @@ echo "Creating Packages '${PACKAGE_GENERIC}' && '${PACKAGE_API}'"
 wsk package create ${PACKAGE_GENERIC} &> /dev/null || true
 wsk package create ${PACKAGE_API}  &> /dev/null || true
 
-for dir in `find . -maxdepth 1 -mindepth 1 -type d`
+for dir in `find . -maxdepth 1 -mindepth 1 -type d | grep -v _template`
 do
     ACTION=`echo $dir | awk -F'/' '{ print $2 }'`;
 
@@ -35,7 +35,7 @@ echo "Binding parameters to package '${PACKAGE}' ..."
 wsk package delete ${PACKAGE} || true
 wsk package bind ${PACKAGE_GENERIC} ${PACKAGE} -P package.parameters.json
 
-for dir in `find . -maxdepth 1 -mindepth 1 -type d`
+for dir in `find . -maxdepth 1 -mindepth 1 -type d | grep -v _template`
 do
     ACTION=`echo $dir | awk -F'/' '{ print $2 }'`;
 

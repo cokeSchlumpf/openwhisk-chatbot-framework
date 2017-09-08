@@ -1,16 +1,15 @@
 {
-  "name": "input",
+  "name": "package_name",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
-  "description": "A test input connector.",
+  "description": "package_description",
   "main": "index.js",
   "scripts": {
     "test": "mocha *.test.js"
   },
   "dependencies": {
-    "lodash": "^4.17.4",
-    "sinon": "^3.2.1"
+    "serverless-botpack-lib": "^1.0.9"
   },
   "devDependencies": {
     "chai": "^4.1.1",

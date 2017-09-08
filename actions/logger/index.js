@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const wskbotfwk = require('serverless-botpack-lib');
 const Validator = require('better-validator');
+const winston = require('winston');
 
 const LEVELS = ['DEBUG', 'INFO', 'WARN', 'ERROR'];
 
@@ -25,6 +26,8 @@ exports.main = (params) => {
       const messagelevel = params.level;
 
       if (_.indexOf(LEVELS, params.level) >= _.indexOf(LEVELS, params.config.logger.level)) {
+        winston[params.level.toLowerCase()](params.message);
+        
         return bot.db
           .create({
             type: 'log',

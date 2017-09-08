@@ -1,6 +1,8 @@
 {
   "name": "input",
   "version": "1.0.0",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
   "description": "A framework action which logs into the database.",
   "main": "index.js",
   "scripts": {
@@ -10,7 +12,8 @@
   "dependencies": {
     "better-validator": "^2.1.3",
     "lodash": "^4.17.4",
-    "serverless-botpack-lib": "^1.0.6"
+    "serverless-botpack-lib": "^1.0.10",
+    "winston": "^2.3.1"
   },
   "devDependencies": {
     "acquit": "^0.5.0",
