@@ -26,22 +26,8 @@ exports.main = (params) => {
   }
 
   const enrichPayload = (payload) => {
-    return bot.db
-      .read({ type: 'user', [`${payload.input.channel}_id`]: payload.input.user })
-      .then(results => {
-        if (_.size(results) > 0) { // we've found an existing user
-          return _.head(results);
-        } else { // no user found
-          const user = _.assign({}, {
-            type: 'user',
-            [`${payload.input.channel}_id`]: payload.input.user
-          }, _.pick(payload.input, 'profile'));
-          return bot.db.create(user);
-        }
-      })
-      .then(user => {
-        return _.assign({}, payload, { conversationcontext: { user } });
-      });
+    return bot.context
+      .load(payload, { [`${payload.input.channel}_id`]: payload.input.user });
   }
 
   const processMiddleware = (middlewares, payload) => {
