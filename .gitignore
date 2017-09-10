@@ -1,6 +1,7 @@
 # Project specific
 package.parameters.json
 serverless-botpack-lib
+actions/_template/package-lock.json
 
 # Logs
 logs

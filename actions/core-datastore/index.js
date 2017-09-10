@@ -89,29 +89,35 @@ const read = (db, params) => {
 const update = (db, params) => {
   const validator = new Validator();
 
-  validator(params).required().isObject(obj => {
-    obj('doc').required().isObject(obj => {
-      obj('_id').required().isString();
+  const hasId = _.get(params, 'doc._id');
+  
+  if (!hasId) {
+    return create(db, params);
+  } else {
+    validator(params).required().isObject(obj => {
+      obj('doc').required().isObject(obj => {
+        obj('_id').required().isString();
+      });
     });
-  });
-
-  return validate(validator, () => {
-    let doc;
-
-    if (!params.doc._rev) {
-      doc = db
-        .get(params.doc._id)
-        .then(result => _.assign({}, params.doc, _.pick(result, '_rev')));
-    } else {
-      doc = Promise.resolve(params.doc);
-    }
-
-    return doc
-      .then(result => db.insert(result))
-      .then(result => db.get(result.id))
-      .then(success())
-      .catch(error('Cannot update document'));
-  });
+  
+    return validate(validator, () => {
+      let doc;
+  
+      if (!params.doc._rev) {
+        doc = db
+          .get(params.doc._id)
+          .then(result => _.assign({}, params.doc, _.pick(result, '_rev')));
+      } else {
+        doc = Promise.resolve(params.doc);
+      }
+  
+      return doc
+        .then(result => db.insert(result))
+        .then(result => db.get(result.id))
+        .then(success())
+        .catch(error('Cannot update document'));
+    });
+  }
 }
 
 const remove = (db, params) => {
