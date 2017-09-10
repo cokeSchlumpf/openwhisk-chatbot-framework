@@ -67,7 +67,10 @@ describe('core-middleware', () => {
         }
       }))
       .onCall(3).returns(Promise.resolve({
-
+        statusCode: 200
+      }))
+      .onCall(4).returns(Promise.resolve({
+        statusCode: 200
       }));
 
     // mock openwhisk action calls to return successful results
@@ -106,7 +109,7 @@ describe('core-middleware', () => {
 
     return requireMock.reRequire('./index').main({ payload, config })
       .then(result => {
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('testpackage/core-loadcontext');
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('testpackage/core-contextload');
         chai.expect(invokeStub.getCall(0).args[0].params.user.facebook_id).to.equal('1234');
         chai.expect(result.result).to.have.lengthOf(2);
       });
@@ -143,7 +146,12 @@ describe('core-middleware', () => {
           }
         }
       }))
-      .onCall(2).returns(Promise.resolve());
+      .onCall(2).returns(Promise.resolve({
+        statusCode: 200
+      }))
+      .onCall(3).returns(Promise.resolve({
+        statusCode: 200
+      }));
 
     // mock openwhisk action calls to return successful results
     requireMock('openwhisk', () => ({

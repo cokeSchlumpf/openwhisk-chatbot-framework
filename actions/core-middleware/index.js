@@ -49,11 +49,19 @@ exports.main = (params) => {
 
           switch (statusCode) {
             case 204: // No content, done
-              return Promise.resolve([middleware.action]);
+              return Promise.resolve({
+                processed: [middleware.action],
+                payload: payload
+              });
             case 200:
               return checkPayload(payload, middleware.action)
                 .then(payload => processMiddleware(remaining, payload))
-                .then(result => _.concat([middleware.action], result));
+                .then(result => {
+                  return {
+                    processed: _.concat([middleware.action], result.processed),
+                    payload: result.payload
+                  };
+                });
             default:
               return Promise.reject({
                 statusCode: 400,
@@ -67,13 +75,17 @@ exports.main = (params) => {
           }
         });
     } else {
-      return Promise.resolve([]);
+      return Promise.resolve({
+        processed: [],
+        payload: payload
+      });
     }
   }
 
   return checkPayload(payload)
     .then(payload => enrichPayload(payload))
     .then(payload => processMiddleware(middlewares, payload))
+    .then(result => bot.context.persist(result.payload).then(() => result.processed))
     .then(result => ({
       statusCode: 200,
       result

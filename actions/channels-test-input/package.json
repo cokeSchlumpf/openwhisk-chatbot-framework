@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.4",
+    "serverless-botpack-lib": "^1.0.15",
     "sinon": "^3.2.1"
   },
   "devDependencies": {

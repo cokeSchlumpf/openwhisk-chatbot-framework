@@ -13,7 +13,7 @@
     "lodash": "^4.17.4",
     "mustache": "^2.3.0",
     "openwhisk": "^3.7.0",
-    "serverless-botpack-lib": "file:../../serverless-botpack-lib"
+    "serverless-botpack-lib": "^1.0.15"
   },
   "devDependencies": {
     "chai": "^4.1.1",

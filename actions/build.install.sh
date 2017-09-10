@@ -6,5 +6,7 @@ do
       echo "Installing dependencies for '${dir}' ..."
       which ncu > /dev/null && ncu -a serverless-botpack-lib
       npm install
+      # npm uninstall --save serverless-botpack-lib
+      # npm install --save serverless-botpack-lib
     popd > /dev/null
 done

@@ -5,10 +5,13 @@ exports.main = (params) => {
 
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve({
-        statusCode: 200,
-        payload: params.payload
-      });
+      bot.send('#hello')
+        .then(payload => {
+          resolve({
+            statusCode: 200,
+            payload: payload
+          });
+        });
     }, 15000);
   });
 }
