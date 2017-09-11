@@ -7,9 +7,11 @@ exports.main = (params) => {
     setTimeout(() => {
       bot.send('#hello')
         .then(payload => {
-          resolve({
-            statusCode: 200,
-            payload: payload
+          bot.send('#howdy').then(payload => {
+            resolve({
+              statusCode: 200,
+              payload: payload
+            });
           });
         });
     }, 15000);

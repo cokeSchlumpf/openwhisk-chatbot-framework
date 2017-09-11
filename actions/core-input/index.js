@@ -21,7 +21,7 @@ exports.main = routes(action => {
       }
     }
 
-    const processRequest = (ow, request, connectors, config, payloadId = uuid()) => {
+    const processRequest = (ow, request, connectors, config, payloadId = uuid(), received = Date.now() / 1000 | 0) => {
       const connector = _.first(connectors);
       const remaining = _.tail(connectors);
 
@@ -29,7 +29,8 @@ exports.main = routes(action => {
         const payload = {
           id: payloadId,
           input: {
-            channel: connector.channel
+            channel: connector.channel,
+            timestamp: received
           }
         }
 
@@ -85,7 +86,7 @@ exports.main = routes(action => {
                 });
             } else if (result.statusCode === 422) {
               // Input Connector did not recognize this input, try the next one.
-              return processRequest(ow, request, remaining, config, payloadId);
+              return processRequest(ow, request, remaining, config, payloadId, received);
             } else {
               return Promise.reject({
                 statusCode: 503,

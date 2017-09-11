@@ -28,6 +28,8 @@ exports.main = (params) => {
     }
 
     // Prepare payload.output
+    _.set(params, 'payload.output.timestamp', Date.now() / 1000 | 0)
+    
     _.set(params, 'payload.output.channel',
       _.get(params, 'payload.output.channel') ||
       _.get(params, 'channel') ||
@@ -136,7 +138,7 @@ exports.main = (params) => {
       name: `${_.get(params.config, 'openwhisk.package')}/core-contextpersist`,
       blocking: true,
       result: true,
-      params: { payload }
+      params: { payload, force: true }
     }
 
     return ow.actions.invoke(invokeParams)

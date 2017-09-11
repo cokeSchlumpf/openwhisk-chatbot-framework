@@ -11,7 +11,7 @@
   "dependencies": {
     "lodash": "^4.17.4",
     "openwhisk": "^3.7.0",
-    "serverless-botpack-lib": "^1.0.15"
+    "serverless-botpack-lib": "^1.0.18"
   },
   "devDependencies": {
     "chai": "^4.1.1",

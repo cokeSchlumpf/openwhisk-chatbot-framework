@@ -9,7 +9,7 @@
     "test": "mocha *.test.js"
   },
   "dependencies": {
-    "serverless-botpack-lib": "^1.0.15"
+    "serverless-botpack-lib": "^1.0.17"
   },
   "devDependencies": {
     "chai": "^4.1.1",
