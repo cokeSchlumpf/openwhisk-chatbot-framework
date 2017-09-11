@@ -7,6 +7,20 @@ exports.main = (params) => {
   const bot = botpack(params);
   const ow = openwhisk();
 
+  const archiveOutput = (payload) => {
+    const newPayload = _.cloneDeep(payload);
+
+    _.set(newPayload, 'output.sent', _
+      .chain(newPayload)
+      .get('output.sent', [])
+      .concat(_.omit(newPayload.output, 'sent'))
+      .value());
+    
+    _.set(newPayload, 'output', _.pick(newPayload.output, 'sent'));
+
+    return Promise.resolve(newPayload);
+  }
+
   const enrichParams = () => {
     // Generate payload id if not existing
     if (!_.get(params, 'payload.id')) {
@@ -147,6 +161,7 @@ exports.main = (params) => {
     .then(params => bot.util.validatePayload(params.payload, 'OUTPUT'))
     .then(generateMessage)
     .then(callOutputConnector)
+    .then(archiveOutput)
     .then(persistContext)
     .then(result => ({
       statusCode: 200,
