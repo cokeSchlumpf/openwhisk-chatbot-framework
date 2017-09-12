@@ -13,5 +13,5 @@ chmod 777 wsk
 export PATH=$PATH:$(pwd)
 wsk property set --apihost $OPENWHISK_APIHOST --auth $OPENWHISK_AUTHKEY
 
-# deploy service
-#./build.deploy.sh
+#deploy service
+./build.deploy.sh
