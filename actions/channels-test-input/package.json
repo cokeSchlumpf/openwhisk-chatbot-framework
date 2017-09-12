@@ -10,12 +10,12 @@
   },
   "dependencies": {
     "lodash": "^4.17.4",
-    "serverless-botpack-lib": "^1.0.18",
-    "sinon": "^3.2.1"
+    "serverless-botpack-lib": "^1.0.18"
   },
   "devDependencies": {
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
-    "mock-require": "^2.0.2"
+    "mock-require": "^2.0.2",
+    "sinon": "^3.2.1"
   }
 }
