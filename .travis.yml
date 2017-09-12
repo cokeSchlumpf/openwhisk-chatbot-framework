@@ -1,6 +1,5 @@
 language: node_js
 node_js:
 - '6'
-skript:
-- pushd actions
-- ./build.install.sh
+script:
+- echo "Hello World!"
