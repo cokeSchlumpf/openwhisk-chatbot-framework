@@ -2,7 +2,7 @@
   "config": {
     "cloudant": {
       "database": "owsk-bot",
-      "url": "${CLOUDANT_URL}"
+      "url": "https://b33e09bd-c08b-4b6f-a6f3-79f121d38be2-bluemix:${CLOUDANT_PASSWORD}@b33e09bd-c08b-4b6f-a6f3-79f121d38be2-bluemix.cloudant.com"
     },
     "conversation": {
       "username": "${CONVERSATION_USERNAME}",
