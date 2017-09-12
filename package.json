@@ -5,7 +5,7 @@
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
   "description": "The framework action which receives the inputs.",
   "scripts": {
-    "install": "cd actions && ./build.install.sh && cd ..",
+    "install": "cd actions && ./build.installprod.sh && cd ..",
     "test": "cd actions && ./build.test.sh && ./build.clean.sh && cd .."
   }
 }

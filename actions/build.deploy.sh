@@ -18,7 +18,6 @@ do
       echo "Creating package for action '${ACTION}' ..."
       NAME="${PACKAGE_GENERIC}/${ACTION}"
       DESCRIPTION=`cat package.json | grep description | awk -F'"' '{ print $4 }'`
-      npm install --only=production
       zip -r action.zip * > /dev/null
 
       echo "Creating action '${NAME}' ..."
