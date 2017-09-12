@@ -10,7 +10,7 @@ echo "Creating Packages '${PACKAGE_GENERIC}' && '${PACKAGE_API}'"
 wsk package create ${PACKAGE_GENERIC} &> /dev/null || true
 wsk package create ${PACKAGE_API}  &> /dev/null || true
 
-for dir in `find . -maxdepth 1 -mindepth 1 -type d | grep -v _template | grep core-input`
+for dir in `find . -maxdepth 1 -mindepth 1 -type d | grep -v _template`
 do
     ACTION=`echo $dir | awk -F'/' '{ print $2 }'`;
 
