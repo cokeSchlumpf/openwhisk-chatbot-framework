@@ -29,8 +29,7 @@ exports.main = routes(action => {
         const payload = {
           id: payloadId,
           input: {
-            channel: connector.channel,
-            timestamp: received
+            channel: connector.channel
           }
         }
 
@@ -62,6 +61,8 @@ exports.main = routes(action => {
                   return bot.util.validate(validator);
                 })
                 .then(() => {
+                  _.set(result, 'payload.input.timestamp', received);
+
                   const invokeParams = {
                     name: `${_.get(config, 'openwhisk.package')}/core-middleware`,
                     blocking: false,
@@ -84,6 +85,19 @@ exports.main = routes(action => {
                     }
                   });
                 });
+            } else if (result.statusCode === 204) {
+              // Input connector did recognize the payload and sends an answer, but does not start message processing
+              const validator = new Validator();
+
+              validator(result).required().isObject(obj => {
+                obj('response').required().isObject(obj => {
+                  obj('statusCode').required().isNumber().integer();
+                  obj('body').isObject();
+                });
+              });
+
+              return bot.util.validate(validator)
+                .then(() => result);
             } else if (result.statusCode === 422) {
               // Input Connector did not recognize this input, try the next one.
               return processRequest(ow, request, remaining, config, payloadId, received);

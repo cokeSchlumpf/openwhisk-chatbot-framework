@@ -1,0 +1,3 @@
+skript:
+- pushd actions
+- ./build.install.sh

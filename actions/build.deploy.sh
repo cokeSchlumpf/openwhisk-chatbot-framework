@@ -10,7 +10,7 @@ echo "Creating Packages '${PACKAGE_GENERIC}' && '${PACKAGE_API}'"
 wsk package create ${PACKAGE_GENERIC} &> /dev/null || true
 wsk package create ${PACKAGE_API}  &> /dev/null || true
 
-for dir in `find . -maxdepth 1 -mindepth 1 -type d | grep -v _template`
+for dir in `find . -maxdepth 1 -mindepth 1 -type d | grep -v _template | grep core-input`
 do
     ACTION=`echo $dir | awk -F'/' '{ print $2 }'`;
 
@@ -18,6 +18,7 @@ do
       echo "Creating package for action '${ACTION}' ..."
       NAME="${PACKAGE_GENERIC}/${ACTION}"
       DESCRIPTION=`cat package.json | grep description | awk -F'"' '{ print $4 }'`
+      npm install --only=production
       zip -r action.zip * > /dev/null
 
       echo "Creating action '${NAME}' ..."
