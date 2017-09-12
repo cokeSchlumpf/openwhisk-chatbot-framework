@@ -1,0 +1,11 @@
+{
+  "name": "serverless-botpacl",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
+  "description": "The framework action which receives the inputs.",
+  "scripts": {
+    "install": "pushd actions && ./build.install.sh && popd",
+    "test": "pushd actions && ./build.test.sh && ./build.clean.sh && popd"
+  }
+}
