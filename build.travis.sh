@@ -6,7 +6,6 @@ sed -i 's/${CLOUDANT_PASSWORD}/'$CLOUDANT_PASSWORD'/g' package.parameters.json
 sed -i 's/${CONVERSATION_USERNAME}/'$CONVERSATION_USERNAME'/g' package.parameters.json
 sed -i 's/${CONVERSATION_PASSWORD}/'$CONVERSATION_PASSWORD'/g' package.parameters.json
 sed -i 's/${CONVERSATION_WORKSPACEID}/'$CONVERSATION_WORKSPACEID'/g' package.parameters.json
-cat package.parameters.json
 
 # install and configure Openwhisk CLI
 wget https://openwhisk.ng.bluemix.net/cli/go/download/linux/amd64/wsk
