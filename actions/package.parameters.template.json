@@ -1,0 +1,65 @@
+{
+  "config": {
+    "cloudant": {
+      "database": "owsk-bot",
+      "url": "${CLOUDANT_URL}"
+    },
+    "conversation": {
+      "username": "${CONVERSATION_USERNAME}",
+      "password": "${CONVERSATION_PASSWORD}",
+      "workspace": "${CONVERSATION_WORKSPACEID}"
+    },
+    "connectors": {
+      "input": [
+        {
+          "channel": "facebook",
+          "action": "serverless-botpack/channels-facebook-input",
+          "parameters": {}
+        },
+        {
+          "channel": "test",
+          "action": "serverless-botpack/channels-test-input",
+          "parameters": {}
+        }
+      ],
+      "output": [
+        {
+          "channel": "test",
+          "action": "serverless-botpack/channels-test-output",
+          "parameters": {}
+        }
+      ]
+    },
+    "logger": {
+      "level": "INFO"
+    },
+    "messages": {
+      "#hello": {
+        "text": "Hello {{{name}}}",
+        "text.de_DE": "Hallo {{{name}}}"
+      },
+      "#howdy": {
+        "text": [
+          "How are you?",
+          "Howdy?",
+          "You have a good day?"
+        ]
+      },
+      "#goodbye": {
+        "text": [
+          "Auf wiedersehen!",
+          "Bis zum nächsten mal, {{{name}}}!"
+        ]
+      }
+    },
+    "middleware": [
+      {
+        "action": "serverless-botpack/middleware-test",
+        "parameters": {}
+      } 
+    ],
+    "openwhisk": {
+      "package": "serverless-botpack"
+    }
+  }
+}
