@@ -92,12 +92,14 @@ exports.main = routes(action => {
               validator(result).required().isObject(obj => {
                 obj('response').required().isObject(obj => {
                   obj('statusCode').required().isNumber().integer();
-                  obj('body').isObject();
                 });
               });
-
+              
               return bot.util.validate(validator)
-                .then(() => result);
+                .then(() => result)
+                .catch(error => {
+                  return Promise.reject(error);
+                });
             } else if (result.statusCode === 422) {
               // Input Connector did not recognize this input, try the next one.
               return processRequest(ow, request, remaining, config, payloadId, received);
@@ -124,7 +126,7 @@ exports.main = routes(action => {
     }
 
     const processResponse = (connectorResponse) => {
-      if (_.isPlainObject(connectorResponse.response.body)) {
+      if (connectorResponse.response.body) {
         res
           .status(connectorResponse.response.statusCode)
           .send(connectorResponse.response.body);

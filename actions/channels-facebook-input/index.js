@@ -9,7 +9,7 @@ exports.main = (params) => {
       statusCode: 204,
       response: {
         statusCode: 200,
-        body: ` ${body['hub.challenge']} `
+        body: body['hub.challenge']
       }
     }
   } else {

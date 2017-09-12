@@ -161,4 +161,42 @@ describe('core-input', () => {
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
       });
   });
+
+  it('returns the response of the connector and stops processing on statusCode 204', () => {
+    // create stubs for actual functions
+    const invokeStub = sinon.stub()
+      .returns(Promise.resolve({
+        statusCode: 204,
+        response: {
+          statusCode: 200,
+          body: 'Hello'
+        }
+      }));
+
+    // mock openwhisk action calls to return successful results
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    // sample configuration used for the test
+    const config = {
+      connectors: {
+        input: [
+          {
+            channel: 'channel_00_name',
+            action: 'package/action_00',
+            parameters: {}
+          }
+        ]
+      }
+    }
+
+    return requireMock.reRequire('./index').main({ __ow_method: 'get', __ow_path: '/', config })
+      .then(result => {
+        chai.expect(result.statusCode).to.equal(200);
+        chai.expect(result.body).to.equal('Hello');
+      });
+  });
 });
