@@ -14,7 +14,7 @@
         {
           "channel": "facebook",
           "action": "serverless-botpack/channels-facebook-input",
-          "parameters": {}
+          "parameters": { }
         },
         {
           "channel": "test",
@@ -29,6 +29,9 @@
           "parameters": {}
         }
       ]
+    },
+    "facebook": {
+      "verify_token": "af10ccfc40"
     },
     "logger": {
       "level": "INFO"
