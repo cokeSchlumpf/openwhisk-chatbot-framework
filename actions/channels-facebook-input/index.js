@@ -12,6 +12,30 @@ exports.main = (params) => {
         body: body['hub.challenge']
       }
     }
+  } else if (body['object'] === 'page') {
+    const message = _
+      .chain(body['entry'])
+      .reduce((messages, entry) => {
+        return _.reduce(entry.messaging, (messages, event) => {
+          if (event.message) {
+            return _.concat(messages, event.message);
+          } else {
+            return messages;
+          }
+        }, messages);
+      }, [])
+      .join("\n\n")
+      .value();
+
+    _.set(params, 'payload.input.message', message);
+
+    return {
+      statusCode: 200,
+      payload: params.payload,
+      response: {
+        statusCode: 200
+      }
+    }
   } else {
     return {
       statusCode: 422
