@@ -31,7 +31,8 @@
       ]
     },
     "facebook": {
-      "verify_token": "af10ccfc40"
+      "verify_token": "af10ccfc40",
+      "access_token": "EAAG0mg0sf0kBAPdGUIbbboX7vfrHruosUzybqTZBZBGOZAqi4PsCMWhXotc0ZCp8hkhY2if8jwWcmLn9MZB9FhB0sKEvxqAwALziaO3C7KLzuZBKrRtaFgBICpcgZAkZA9lCNZCC3ZBAtMlM5uoUmNTNkGmCSowBrW5QvjazZAbfAjMdwZDZD"
     },
     "logger": {
       "level": "INFO"
