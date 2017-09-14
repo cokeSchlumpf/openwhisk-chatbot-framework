@@ -11,7 +11,7 @@
   "dependencies": {
     "lodash": "^4.17.4",
     "request": "^2.81.0",
-    "serverless-botpack-lib": "^1.0.18"
+    "serverless-botpack-lib": "^1.0.19"
   },
   "devDependencies": {
     "chai": "^4.1.1",
