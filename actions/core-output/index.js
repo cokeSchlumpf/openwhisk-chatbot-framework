@@ -127,7 +127,7 @@ exports.main = (params) => {
       return Promise.reject({
         statusCode: 400,
         error: {
-          message: `No input connector found for channel '${payload.output.channel}'.`
+          message: `No output connector found for channel '${payload.output.channel}'.`
         }
       });
     }
