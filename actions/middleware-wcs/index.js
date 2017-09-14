@@ -14,7 +14,9 @@ exports.main = (params) => {
   }));
 
   return conversation.messageAsync({
-    input: { text: params.payload.input.message },
+    input: { 
+      text: _.get(params, 'payload.input.message') 
+    },
     context: _.get(params, 'payload.user.watsoncontext', {})
   }).then(conversationresponse => {
     _.set(params, 'payload.user.watsoncontext', _.get(conversationresponse, 'context', {}));
