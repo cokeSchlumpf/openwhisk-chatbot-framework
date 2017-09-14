@@ -3,7 +3,7 @@ const botpack = require('serverless-botpack-lib');
 exports.main = (params) => {
   const bot = botpack(params);
 
-  bot.log.info(params.payload);
+  bot.log.info(params);
 
   return new Promise((resolve, reject) => {
     bot.send('#hello')
