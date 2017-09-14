@@ -2,7 +2,6 @@ const _ = require('lodash');
 
 exports.main = (params) => {
   const body = _.get(params, 'request.body', {})
-  console.log(_.keys(body));
 
   if (body['hub.mode'] === 'subscribe' && body['hub.verify_token'] === _.get(params, 'config.facebook.verify_token')) {
     return {
@@ -13,25 +12,26 @@ exports.main = (params) => {
       }
     }
   } else if (body['object'] === 'page') {
-    const message = _
+    const input = _
       .chain(body['entry'])
-      .reduce((messages, entry) => {
-        return _.reduce(entry.messaging, (messages, event) => {
-          if (event.message) {
-            return _.concat(messages, event.message);
-          } else {
-            return messages;
-          }
-        }, messages);
-      }, [])
-      .join("\n\n")
+      .map(entry => {
+        return _
+          .map(entry.messaging, event => {
+            if (event.message) {
+              return {
+                user: event.sender.id,
+                message: event.message.text
+              };
+            }
+          })
+          .filter(message => !_.isUndefined(message));
+      })
+      .flattenDeep()
       .value();
-
-    _.set(params, 'payload.input.message', message);
 
     return {
       statusCode: 200,
-      payload: params.payload,
+      input,
       response: {
         statusCode: 200
       }

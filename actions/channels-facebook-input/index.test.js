@@ -3,8 +3,19 @@ const chai = require('chai');
 const requireMock = require('mock-require');
 const sinon = require('sinon');
 
+const action = require('./index');
+
 describe('channels-test-input', () => {
   it('is a stupid test', () => {
-    chai.expect(true).to.be.true;
+    action.main({
+      payload: {
+        
+      },
+      request: {
+        body: {
+          
+        }
+      }
+    })
   });
 });

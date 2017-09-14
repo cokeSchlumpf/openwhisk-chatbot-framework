@@ -7,13 +7,9 @@ exports.main = (params) => {
   console.log(params.payload);
   return {
     statusCode: 200,
-    payload: {
-      id: params.payload.id,
-      input: {
-        channel: params.payload.input.channel,
-        user: '12345',
-        message: 'Hello World!'
-      }
+    input: {
+      user: '12345',
+      message: 'Hello World!'
     },
     response: {
       statusCode: 200,
