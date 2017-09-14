@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "bluebird": "^3.5.0",
+    "lodash": "^4.17.4",
     "serverless-botpack-lib": "^1.0.17",
     "watson-developer-cloud": "^2.39.0"
   },

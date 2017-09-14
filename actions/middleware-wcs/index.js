@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const botpack = require('serverless-botpack-lib');
 const WatsonConversation = require('watson-developer-cloud/conversation/v1');
 
