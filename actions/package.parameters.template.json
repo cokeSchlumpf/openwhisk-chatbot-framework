@@ -65,7 +65,11 @@
       {
         "action": "serverless-botpack/middleware-test",
         "parameters": {}
-      } 
+      },
+      {
+        "action": "serverless-botpack/middleware-wcs",
+        "parameters": {}
+      }
     ],
     "openwhisk": {
       "package": "serverless-botpack"
