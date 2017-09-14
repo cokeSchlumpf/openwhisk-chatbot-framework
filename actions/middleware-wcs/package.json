@@ -9,6 +9,7 @@
     "test": "mocha *.test.js"
   },
   "dependencies": {
+    "bluebird": "^3.5.0",
     "serverless-botpack-lib": "^1.0.17",
     "watson-developer-cloud": "^2.39.0"
   },
