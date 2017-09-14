@@ -1,9 +1,9 @@
 {
-  "name": "channels-test-output",
+  "name": "channels-facebook-output",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
-  "description": "A sample output connector",
+  "description": "A facebook output connector",
   "main": "index.js",
   "scripts": {
     "test": "mocha *.test.js"

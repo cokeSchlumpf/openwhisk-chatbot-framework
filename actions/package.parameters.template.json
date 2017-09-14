@@ -25,7 +25,7 @@
       "output": [
         {
           "channel": "facebook",
-          "action": "serverless-botpack/channels-facebook-input",
+          "action": "serverless-botpack/channels-facebook-output",
           "parameters": {}
         },
         {
