@@ -63,11 +63,11 @@
     },
     "middleware": [
       {
-        "action": "serverless-botpack/middleware-test",
+        "action": "serverless-botpack/middleware-wcs",
         "parameters": {}
       },
       {
-        "action": "serverless-botpack/middleware-wcs",
+        "action": "serverless-botpack/middleware-sendmessage",
         "parameters": {}
       }
     ],

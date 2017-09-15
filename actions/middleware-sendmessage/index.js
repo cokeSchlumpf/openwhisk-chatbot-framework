@@ -1,4 +1,4 @@
-const lodash = require('lodash');
+const _ = require('lodash');
 const botpack = require('serverless-botpack-lib');
 
 exports.main = (params) => {
@@ -6,8 +6,13 @@ exports.main = (params) => {
 
   const message = _.get(params, 'payload.context.message');
   let sendPromise;
+
   if (message) {
-    sendPromise = bot.send(message)
+    if (_.isArray(message)) {
+      sendPromise = Promise.all(_.map(message, msg => bot.send(msg)));
+    } else {
+      sendPromise = bot.send(message)
+    }
   } else {
     sendPromise = Promise.resolve();
   }
