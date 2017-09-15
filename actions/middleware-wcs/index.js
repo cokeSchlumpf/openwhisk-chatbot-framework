@@ -19,12 +19,10 @@ exports.main = (params) => {
     input: { 
       text: _.get(params, 'payload.input.message') 
     },
-    context: _.get(params, 'payload.user.watsoncontext', {})
+    context: _.get(params, 'payload.conversationcontext.watsoncontext', {})
   }).then(conversationresponse => {
-    _.set(params, 'payload.user.watsoncontext', _.get(conversationresponse, 'context', {}));
+    _.set(params, 'payload.conversationcontext.watsoncontext', _.get(conversationresponse, 'context', {}));
     _.set(params, 'payload.context.watsontext', _.join(_.get(conversationresponse, 'output.text', []), ' '));
-
-    bot.log.debug(conversationresponse);
 
     return {
       statusCode: 200,
