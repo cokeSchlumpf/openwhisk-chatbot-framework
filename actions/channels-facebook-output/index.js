@@ -5,7 +5,7 @@ const request = require('request');
 exports.main = (params) => {
   const bot = botpack(params);
 
-  bot.log.info(_.get(params, 'payload.output.message', 'No message found.'));
+  bot.log.debug(_.get(params, 'payload.output.message', 'No message found.'));
 
   return new Promise((resolve, reject) => {
     request({
