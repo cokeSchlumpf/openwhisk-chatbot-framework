@@ -1,0 +1,20 @@
+{
+  "name": "middleware-sendmessage",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
+  "description": "This middleware sends a message, if payload.context.message is set.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha *.test.js"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "serverless-botpack-lib": "^1.0.9"
+  },
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0",
+    "mock-require": "^2.0.2"
+  }
+}
