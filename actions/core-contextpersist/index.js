@@ -6,7 +6,7 @@ exports.main = (params) => {
 
   const persistPayload = (payload) => {
     const persistedPayload = _.assign(
-      _.pick(payload, 'input', 'output', 'id', '_id', '_rev'),
+      _.pick(payload, 'input', 'output', 'context', 'id', '_id', '_rev'),
       {
         type: 'payload',
         user: _.get(payload, 'conversationcontext.user._id')
