@@ -66,7 +66,7 @@ exports.main = (params) => {
               return Promise.reject({
                 statusCode: 400,
                 error: {
-                  message: `The middleare action '${middleware.action}' returned no valid status code.`,
+                  message: `The middleare action '${middleware.action}' returned no valid status code: '${statusCode}'.`,
                   parameters: {
                     payload
                   }
