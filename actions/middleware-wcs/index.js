@@ -22,9 +22,8 @@ exports.main = (params) => {
     context: _.get(params, 'payload.conversationcontext.watsoncontext', {})
   }).then(conversationresponse => {
     _.set(params, 'payload.conversationcontext.wcs', _.get(conversationresponse, 'context', {}));
-    //_.set(params, 'payload.context.wcs', _.get(conversationresponse, 'output', {}));
     _.set(params, 'payload.context.wcs', _.omit(conversationresponse, 'context'));
-    _.set(params, 'payload.context.message', _.get(conversationresponse, 'output.text'));
+    _.set(params, 'payload.context.message', _.get(conversationresponse, 'output.text[0]'));
 
     return {
       statusCode: 200,
