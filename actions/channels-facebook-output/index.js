@@ -15,6 +15,7 @@ exports.main = (params) => {
       headers: {
         'User-Agent': 'Request-Promise'
       },
+      method: 'POST',
       json: {
         recipient: {
           id: _.get(params, 'payload.output.user')
@@ -35,7 +36,9 @@ exports.main = (params) => {
         error: {
           message: 'Unable to send action to Facebook.',
           parameters: {
-            error
+            error,
+            message,
+            options
           }
         }
       };
@@ -51,6 +54,7 @@ exports.main = (params) => {
       headers: {
         'User-Agent': 'Request-Promise'
       },
+      method: 'POST',
       json: {
         recipient: {
           id: _.get(params, 'payload.output.user')
@@ -74,7 +78,9 @@ exports.main = (params) => {
         error: {
           message: 'Unable to send message to Facebook.',
           parameters: {
-            error
+            error,
+            message,
+            options
           }
         }
       };
