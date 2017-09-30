@@ -70,9 +70,18 @@ exports.main = (params) => {
   }
 
   if (_.isString(message)) {
-    sendTextMessage(message);
+    return sendTextMessage(message);
   } else if (_.isObject(message)) {
-    const command = _.keys(message)[0];
-    sendCmd(command);
+    return sendCmd(_.keys(message)[0]);
+  } else {
+    return Promise.reject({
+      statusCode: 400,
+      error: {
+        message: 'The message is not given in a valid format.',
+        parameters: {
+          message
+        }
+      }
+    });
   }
 }
