@@ -31,7 +31,13 @@ exports.main = (params) => {
       bot.log.error("Unable to send action.");
       bot.log.error(error);
       return {
-        statusCode: 400
+        statusCode: 400,
+        error: {
+          message: 'Unable to send action to Facebook.',
+          parameters: {
+            error
+          }
+        }
       };
     });
   }
@@ -64,7 +70,13 @@ exports.main = (params) => {
       bot.log.error("Unable to send message.");
       bot.log.error(error);
       return {
-        statusCode: 400
+        statusCode: 400,
+        error: {
+          message: 'Unable to send message to Facebook.',
+          parameters: {
+            error
+          }
+        }
       };
     });
   }
