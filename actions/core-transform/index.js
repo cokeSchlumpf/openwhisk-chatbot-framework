@@ -38,7 +38,7 @@ exports.main = (params) => {
       || intent);
   }
 
-  const renderMessage = (template) => Mustache.render(template, _.get(params, 'payload.output.context'));
+  const renderMessage = (template) => Mustache.render(template, _.get(params, 'payload'));
 
   return bot.util.validatePayload(params.payload, 'OUTPUT')
     .then(getMessages)
