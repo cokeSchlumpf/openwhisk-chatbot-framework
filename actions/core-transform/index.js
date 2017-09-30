@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const botpack = require('serverless-botpack-lib');
 const Mustache = require('mustache');
+const openwhisk = require('openwhisk');
 const Validator = require('better-validator');
 
 exports.main = (params) => {
@@ -8,13 +9,47 @@ exports.main = (params) => {
 
   const getMessages = () => {
     const validator = new Validator();
-    const messages = bot.config.get('messages', {});
-    
-    validator(messages).required().isObject();
+    return bot.config.get('messages', {}).then(messages => {
+      if (_.get(messages, '$action')) {
+        const action = messages['$action'];
+        const ow = openwhisk();
 
-    return bot.util //
-      .validate(validator, 'Messages are not valid.') //
-      .then(() => messages);
+        const invokeParams = {
+          name: action,
+          blocking: true,
+          result: true,
+          params: {}
+        };
+
+        return ow.actions.invoke(invokeParams)
+          .then(messages => {
+            validator(messages).required().isObject();
+
+            return bot.util //
+              .validate(validator, 'Messages are not valid.') //
+              .then(() => messages);
+          })
+          .catch(error => {
+            return Promise.reject({
+              statusCode: 500,
+              error: {
+                message: `Unable to retrieve messages via action '${action}'.`,
+                parameters: {
+                  error,
+                  action,
+                  messages
+                }
+              }
+            })
+          });
+      } else {
+        validator(messages).required().isObject();
+
+        return bot.util //
+          .validate(validator, 'Messages are not valid.') //
+          .then(() => messages);
+      }
+    });
   }
 
   const getMessage = (message) => {
@@ -31,10 +66,10 @@ exports.main = (params) => {
     const intent = _.get(params, 'payload.output.intent');
     const locale = _.get(params, 'payload.conversationcontext.user.locale', 'NONE');
 
-    return getMessage(_.get(messages, `${intent}.${locale}.${channel}.text`) 
-      || _.get(messages, `${intent}.${channel}.${locale}.text`) 
-      || _.get(messages, `${intent}.${channel}.text`) 
-      || _.get(messages, `${intent}.${locale}.text`) 
+    return getMessage(_.get(messages, `${intent}.${locale}.${channel}.text`)
+      || _.get(messages, `${intent}.${channel}.${locale}.text`)
+      || _.get(messages, `${intent}.${channel}.text`)
+      || _.get(messages, `${intent}.${locale}.text`)
       || _.get(messages, `${intent}.text`)
       || intent);
   }
