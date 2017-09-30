@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const botpack = require('serverless-botpack-lib');
+const ms = require('ms');
 const openwhisk = require('openwhisk');
 const uuid = require('uuid/v4');
 
@@ -15,7 +16,7 @@ exports.main = (params) => {
       .get('output.sent', [])
       .concat(_.omit(newPayload.output, 'sent'))
       .value());
-    
+
     _.set(newPayload, 'output', _.pick(newPayload.output, 'sent'));
 
     return Promise.resolve(newPayload);
@@ -29,7 +30,7 @@ exports.main = (params) => {
 
     // Prepare payload.output
     _.set(params, 'payload.output.timestamp', Date.now() / 1000 | 0)
-    
+
     _.set(params, 'payload.output.channel',
       _.get(params, 'payload.output.channel') ||
       _.get(params, 'channel') ||
@@ -91,38 +92,79 @@ exports.main = (params) => {
       .value();
 
     if (connector) {
-      const invokeParams = {
-        name: connector.action,
-        blocking: true,
-        result: true,
-        params: _.assign({}, connector.parameters, { payload })
-      }
+      const call = (messages) => {
+        const message = _.head(messages);
+        const remaining = _.tail(messages);
 
-      return ow.actions.invoke(invokeParams)
-        .then(result => {
-          if (result.statusCode !== 200) {
+        if (_.isObject(message) && message.wait) {
+          const milliseconds = ms(message.wait);
+
+          if (milliseconds > 30000) {
             return Promise.reject({
-              statusCode: 503,
+              statusCode: 500,
               error: {
-                message: `The output connector '${connector.action}' did not respond with a valid result.`,
+                message: 'The wait timeout is longer than 30s, this is not allowed',
                 parameters: {
-                  result
+                  wait: milliseconds,
+                  wait_text: message.wait
                 }
               }
             })
           } else {
-            return Promise.resolve(payload);
+            return new Promise((resolve, reject) => {
+              setTimeout(resolve, milliseconds);
+            })
+            .then(() => {
+              return call(remaining);
+            });
           }
-        })
-        .catch(error => {
-          return Promise.reject({
-            statusCode: 503,
-            error: {
-              message: `There was an error calling the connector '${connector.action}'.`,
-              cause: error
-            }
-          })
-        });
+        } else {
+          const invokeParams = {
+            name: connector.action,
+            blocking: true,
+            result: true,
+            params: _.assign({ message }, connector.parameters, { payload })
+          }
+
+          return ow.actions.invoke(invokeParams)
+            .then(result => {
+              if (result.statusCode !== 200) {
+                return Promise.reject({
+                  statusCode: 503,
+                  error: {
+                    message: `The output connector '${connector.action}' did not respond with a valid result.`,
+                    parameters: {
+                      result
+                    }
+                  }
+                })
+              } else {
+                if (_.size(remaining) > 0) {
+                  return call(remaining);
+                } else {
+                  return Promise.resolve(payload);
+                }
+              }
+            })
+            .catch(error => {
+              return Promise.reject({
+                statusCode: 503,
+                error: {
+                  message: `There was an error calling the connector '${connector.action}'.`,
+                  cause: error
+                }
+              })
+            });
+        }
+      }
+
+      const message = _.get(payload, 'output.message');
+      
+      if (_.isArray(message)) {
+        return call(message);
+      } else {
+        return call([ message ]);
+      }
     } else {
       return Promise.reject({
         statusCode: 400,

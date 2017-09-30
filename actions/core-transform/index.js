@@ -12,7 +12,8 @@ exports.main = (params) => {
     
     validator(messages).required().isObject();
 
-    return bot.util.validate(validator, 'Messages are not valid.')
+    return bot.util //
+      .validate(validator, 'Messages are not valid.') //
       .then(() => messages);
   }
 
@@ -38,7 +39,20 @@ exports.main = (params) => {
       || intent);
   }
 
-  const renderMessage = (template) => Mustache.render(template, _.get(params, 'payload'));
+  const renderMessage = (template) => {
+    if (_.isObject(template)) {
+      const seq = _.get(template, 'seq', []);
+      return _.map(seq, item => {
+        if (_.isString(item)) {
+          return Mustache.render(item, _.get(params, 'payload'));
+        } else {
+          return item;
+        }
+      });
+    } else {
+      return Mustache.render(template, _.get(params, 'payload'));
+    }
+  }
 
   return bot.util.validatePayload(params.payload, 'OUTPUT')
     .then(getMessages)
