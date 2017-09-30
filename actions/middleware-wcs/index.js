@@ -5,24 +5,33 @@ const WatsonConversation = require('watson-developer-cloud/conversation/v1');
 
 exports.main = (params) => {
   const bot = botpack(params);
+  const contextpath = _.get(params, 'contextpath', 'wcs');
 
   const conversation = Promise.promisifyAll(new WatsonConversation({
-    username: _.get(params, 'config.conversation.username', 'no username'),
-    password: _.get(params, 'config.conversation.password', 'no password'),
+    username: _.get(params, 'username', _.get(params, 'config.conversation.username')),
+    password: _.get(params, 'password', _.get(params, 'config.conversation.password')),
     path: {
-      workspace_id: _.get(params, 'config.conversation.workspace', 'no workspace')
+      workspace_id: _.get(params, 'workspace', _.get(params, 'config.conversation.workspace'))
     },
     version_date: WatsonConversation.VERSION_DATE_2017_04_21
   }));
 
   return conversation.messageAsync({
     input: {
-      text: _.get(params, 'payload.input.message')
+      text: _.get(params, 'message', _.get(params, 'payload.input.message'))
     },
-    context: _.get(params, 'payload.conversationcontext.watsoncontext', {})
+    context: _.assign(
+      {},
+      _.get(params, `payload.conversationcontext.${contextpath}`, {}),
+      {
+        botkit: {
+          input: _.get(params, 'payload.input'),
+          conversationcontext: _.omit(_.get(params, 'payload.conversationcontext', contextpath))
+        }
+      })
   }).then(conversationresponse => {
-    _.set(params, 'payload.conversationcontext.wcs', _.get(conversationresponse, 'context', {}));
-    _.set(params, 'payload.context.wcs', _.omit(conversationresponse, 'context'));
+    _.set(params, `payload.conversationcontext.${contextpath}`, _.omit(_.get(conversationresponse, 'context', {}), 'botkit'));
+    _.set(params, `payload.context.${contextpath}`, _.omit(conversationresponse, 'context'));
     _.set(params, 'payload.context.message', _.get(conversationresponse, 'output.text[0]'));
 
     return {
