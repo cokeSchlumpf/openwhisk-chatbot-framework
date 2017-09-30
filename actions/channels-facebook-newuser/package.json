@@ -1,17 +1,16 @@
 {
-  "name": "core-contextload",
+  "name": "channels-facebook-newuser",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
-  "description": "An openwhisk action which loads the context from the database for a given user.",
+  "description": "This action gets user data from facebook for new users.",
   "main": "index.js",
   "scripts": {
     "test": "mocha *.test.js"
   },
   "dependencies": {
-    "lodash": "^4.17.4",
-    "openwhisk": "^3.8.0",
-    "serverless-botpack-lib": "^1.0.19"
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "chai": "^4.1.1",
