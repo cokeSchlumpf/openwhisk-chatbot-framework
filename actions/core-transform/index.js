@@ -17,19 +17,19 @@ exports.main = (params) => {
       .then(() => messages);
   }
 
+  const getMessage = (message) => {
+    // In the future message might also be a complex object
+    if (_.isArray(message)) {
+      return getMessage(_.sample(message));
+    } else {
+      return message;
+    }
+  }
+
   const getTemplate = (messages) => {
     const channel = _.get(params, 'payload.output.channel', 'NONE');
     const intent = _.get(params, 'payload.output.intent');
     const locale = _.get(params, 'payload.conversationcontext.user.locale', 'NONE');
-
-    const getMessage = (message) => {
-      // In the future message might also be a complex object
-      if (_.isArray(message)) {
-        return getMessage(_.sample(message));
-      } else {
-        return message;
-      }
-    }
 
     return getMessage(_.get(messages, `${intent}.${locale}.${channel}.text`) 
       || _.get(messages, `${intent}.${channel}.${locale}.text`) 
@@ -43,8 +43,8 @@ exports.main = (params) => {
     if (_.isObject(template)) {
       const seq = _.get(template, 'seq', []);
       return _.map(seq, item => {
-        if (_.isString(item)) {
-          return Mustache.render(item, _.get(params, 'payload'));
+        if (_.isString(item) || _.isArray(item)) {
+          return Mustache.render(getMessage(item), _.get(params, 'payload'));
         } else {
           return item;
         }
