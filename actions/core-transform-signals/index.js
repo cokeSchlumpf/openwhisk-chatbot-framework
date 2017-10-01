@@ -24,11 +24,11 @@ exports.main = (params) => {
 
         return ow.actions.invoke(invokeParams)
           .then(messages => {
-            validator(messages).required().isArray(item => item.isObject());
+            validator(messages.result).required().isArray(item => item.isObject());
 
             return bot.util //
               .validate(validator, 'Messages are not valid.') //
-              .then(() => messages);
+              .then(() => messages.result);
           })
           .catch(error => {
             return Promise.reject({
