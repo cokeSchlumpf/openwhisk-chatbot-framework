@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "bluebird": "^3.5.0",
+    "dateformat": "^3.0.2",
     "lodash": "^4.17.4",
     "serverless-botpack-lib": "^1.0.19",
     "watson-developer-cloud": "^2.39.0"
