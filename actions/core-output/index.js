@@ -58,8 +58,9 @@ exports.main = (params) => {
   }
 
   const generateMessage = (payload) => {
+    const transformer = _.get(params, 'config.messages_transformer', `${_.get(params.config, 'openwhisk.package')}/core-transform`)
     const invokeParams = {
-      name: `${_.get(params.config, 'openwhisk.package')}/core-transform`,
+      name: transformer,
       blocking: true,
       result: true,
       params: { payload }
@@ -71,7 +72,7 @@ exports.main = (params) => {
           return Promise.reject({
             statusCode: 503,
             error: {
-              message: 'The core-transform action did not respond with a valid result.',
+              message: `The transformer '${transformer}' did not respond with a valid result.`,
               parameters: {
                 result
               }
