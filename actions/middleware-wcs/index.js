@@ -27,6 +27,7 @@ exports.main = (params) => {
       {},
       _.get(params, `payload.conversationcontext.${contextpath}`, {}),
       {
+        timezone: 'CET',
         botkit: {
           input: _.get(params, 'payload.input'),
           conversationcontext: _.omit(_.get(params, 'payload.conversationcontext', contextpath)),
