@@ -7,6 +7,7 @@ const WatsonConversation = require('watson-developer-cloud/conversation/v1');
 exports.main = (params) => {
   const bot = botpack(params);
   const contextpath = _.get(params, 'contextpath', 'wcs');
+  const messagepath = _.get(params, 'messagepath', 'context.message');
 
   const conversation = Promise.promisifyAll(new WatsonConversation({
     username: _.get(params, 'username', _.get(params, 'config.conversation.username')),
@@ -42,7 +43,7 @@ exports.main = (params) => {
   }).then(conversationresponse => {
     _.set(params, `payload.conversationcontext.${contextpath}`, _.omit(_.get(conversationresponse, 'context', {}), 'botkit'));
     _.set(params, `payload.context.${contextpath}`, _.omit(conversationresponse, 'context'));
-    _.set(params, 'payload.context.message', _.get(conversationresponse, 'output.text[0]'));
+    _.set(params, `payload.${messagepath}`, _.get(conversationresponse, 'output.text', []));
 
     return {
       statusCode: 200,
