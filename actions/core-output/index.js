@@ -111,12 +111,24 @@ exports.main = (params) => {
               }
             })
           } else {
-            return new Promise((resolve, reject) => {
-              setTimeout(resolve, milliseconds);
-            })
-            .then(() => {
-              return call(remaining);
-            });
+            if (message.typing) {
+              return call([ { typing_on: true } ])
+                .then(() => {
+                  return new Promise((resolve, reject) => {
+                    setTimeout(resolve, milliseconds);
+                  });
+                })
+                .then(() => {
+                  return call(_.concat([ { typing_off: true } ], remaining));
+                });
+            } else {
+              return new Promise((resolve, reject) => {
+                setTimeout(resolve, milliseconds);
+              })
+                .then(() => {
+                  return call(remaining);
+                });
+            }
           }
         } else {
           const invokeParams = {
@@ -159,11 +171,11 @@ exports.main = (params) => {
       }
 
       const message = _.get(payload, 'output.message');
-      
+
       if (_.isArray(message)) {
         return call(message);
       } else {
-        return call([ message ]);
+        return call([message]);
       }
     } else {
       return Promise.reject({
