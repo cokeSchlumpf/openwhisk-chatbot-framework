@@ -112,22 +112,21 @@ exports.main = (params) => {
             })
           } else {
             if (message.typing) {
-              return call([ { typing_on: true } ])
+              return call([{ typing_on: true }])
                 .then(() => {
                   return new Promise((resolve, reject) => {
                     setTimeout(resolve, milliseconds);
                   });
                 })
                 .then(() => {
-                  return call(_.concat([ { typing_off: true } ], remaining));
+                  return call(_.concat([{ typing_off: true }], remaining));
                 });
             } else {
               return new Promise((resolve, reject) => {
                 setTimeout(resolve, milliseconds);
-              })
-                .then(() => {
-                  return call(remaining);
-                });
+              }).then(() => {
+                return call(remaining);
+              });
             }
           }
         } else {
