@@ -93,7 +93,7 @@ exports.main = (params) => {
           const bestMatch = _.sample(_.filter(ranking, { count: ranking[0].count })).message;
 
           if (_.isArray(bestMatch.value)) {
-            return findBestMatch(bestMatch.value, _.without(intents, _.keys(bestMatch)));
+            return findBestMatch(bestMatch.value, intents);
           } else if (_.isObject(bestMatch.value)) {
             return _.get(bestMatch.value, `${locale}.${channel}.text`) ||
               _.get(bestMatch.value, `${channel}.${locale}.text`) ||
