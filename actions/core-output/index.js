@@ -96,6 +96,10 @@ exports.main = (params) => {
         const message = _.head(messages);
         const remaining = _.tail(messages);
 
+        console.log(JSON.stringify(message));
+        console.log('---');
+        console.log(JSON.stringify(messages));
+
         if (_.isObject(message) && message.wait) {
           const milliseconds = ms(message.wait);
 
