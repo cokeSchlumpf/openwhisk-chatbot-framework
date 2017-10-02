@@ -71,7 +71,7 @@ exports.main = (params) => {
       const findBestMatch = (messages, intents) => {
         const signals = _
           .chain(intents)
-          .map(signal => _.split(signal, ':', 1))
+          .map(signal => _.split(signal, ':', 2))
           .filter(signal => {
             return _.size(signal) === 2
           })
