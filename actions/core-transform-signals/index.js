@@ -67,24 +67,32 @@ exports.main = (params) => {
     const intent = _.get(params, 'payload.output.intent');
     const locale = _.get(params, 'payload.conversationcontext.user.locale', 'NONE');
 
-    if (_.startsWith(intent, '#')) {
+    if (_.isString(intent) && _.startsWith(_.trim(intent), '$')) {
       const findBestMatch = (messages, intents) => {
+        const signals = _
+          .chain(intents)
+          .map(signal => _.split(signal, ':'))
+          .filter(signal => {
+            return _.size(signal) === 2
+          })
+          .fromPairs()
+          .value();
+
         const ranking = _
           .chain(messages)
-          .map(message => {
-            const count = _.reduce(intents, (count, intent) => {
-              if (message[intent] === true) {
-                return count = count + 1;
-              } else {
-                return count;
-              }
-            }, 0);
-
-            return {
-              count,
-              message
-            }
+          .filter(message => {
+            return _.isUndefined(_.find(signals, (value, signal) => !_.isUndefined(message[signal]) && message[signal] !== value))
           })
+          .map(message => ({
+            count: _.reduce(signals, (count, value, signal) => {
+              if (_.isUndefined(message[signal])) {
+                return count;
+              } else {
+                return count = count + 1;
+              }
+            }, 0),
+            message
+          }))
           .sortBy(['count'])
           .reverse()
           .value();

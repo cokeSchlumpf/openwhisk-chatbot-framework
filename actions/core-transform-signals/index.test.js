@@ -22,14 +22,14 @@ describe('core-transform', () => {
     const config = {
       messages: [
         {
-          '#hello': true,
-          '#foo': true,
+          '$intent': 'hello',
+          '$signal2': 'foo',
           value: {
             text: 'Hello {{{output.context.name}}}'
           }
         },
         {
-          '#hello': true,
+          '$intent': 'blabla',
           value: {
             text: 'Not such a good ranking'
           }
@@ -50,7 +50,7 @@ describe('core-transform', () => {
       },
       output: {
         channel: 'testchannel',
-        intent: '#hello #foo',
+        intent: '$intent:hello $signal2:foo',
         user: 'abcdefg',
         context: {
           name: 'Egon'
@@ -85,10 +85,10 @@ describe('core-transform', () => {
     const config = {
       messages: [
         {
-          '#hello': true,
+          '$intent': 'hello',
           value: [
             {
-              '#foo': true,
+              '$signal2': 'foo',
               value: {
                 DE_de: {
                   testchannel: {
@@ -118,7 +118,7 @@ describe('core-transform', () => {
       output: {
         channel: 'testchannel',
         user: 'abcdefg',
-        intent: '#hello #foo',
+        intent: '$intent:hello $signal2:foo',
         context: {
           name: 'Egon'
         }
@@ -152,7 +152,7 @@ describe('core-transform', () => {
     const config = {
       messages: [
         {
-          '#hello': true,
+          '$intent': 'hello',
           value: {
             text: {
               seq: [
@@ -165,7 +165,7 @@ describe('core-transform', () => {
           }
         },
         {
-          '#foo': true,
+          '$intent': 'foo',
           value: {
             text: {
               seq: [
@@ -193,7 +193,7 @@ describe('core-transform', () => {
       },
       output: {
         channel: 'testchannel',
-        intent: '#hello',
+        intent: '$intent:hello',
         user: 'abcdefg',
         context: {
           name: 'Egon'
@@ -216,10 +216,11 @@ describe('core-transform', () => {
   it('retrieves the messages from a action if defined in the configuration.', () => {
     // create stubs for openwhisk calls
     const invokeStub = sinon.stub()
-      .onCall(0).returns(Promise.resolve(
-        [
+      .onCall(0).returns(Promise.resolve(({
+        statusCode: 200,
+        result: [
           {
-            '#hello': true,
+            '$intent': 'hello',
             value: {
               text: {
                 seq: [
@@ -232,7 +233,7 @@ describe('core-transform', () => {
             }
           },
           {
-            '#foo': true,
+            '$intent': 'foo',
             value: {
               text: {
                 seq: [
@@ -245,7 +246,7 @@ describe('core-transform', () => {
             }
           }
         ]
-      ));
+      })));
 
     // mock openwhisk action calls to return successful results
     requireMock('openwhisk', () => ({
@@ -273,7 +274,7 @@ describe('core-transform', () => {
       },
       output: {
         channel: 'testchannel',
-        intent: '#hello',
+        intent: '$intent:hello',
         user: 'abcdefg',
         context: {
           name: 'Egon'
