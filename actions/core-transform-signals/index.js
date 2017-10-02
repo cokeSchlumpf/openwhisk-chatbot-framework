@@ -73,13 +73,11 @@ exports.main = (params) => {
           .chain(intents)
           .map(signal => _.split(signal, ':'))
           .filter(signal => {
-            return _.size(signal) < 2
+            return _.size(signal) >= 2
           })
-          .map(signal => _.concat([signal[0]], [ _.join(_.tail(signal), ':') ]))
+          .map(signal => _.concat([signal[0]], _.join(_.tail(signal), ':')))
           .fromPairs()
           .value();
-
-        console.log(JSON.stringify(signals));
 
         const ranking = _
           .chain(messages)
@@ -99,8 +97,6 @@ exports.main = (params) => {
           .sortBy(['count'])
           .reverse()
           .value();
-
-        console.log(JSON.stringify(ranking));
 
         if (_.size(ranking) > 0 && _.size(signals) > 0) {
           const bestMatch = _.sample(_.filter(ranking, { count: ranking[0].count })).message;
