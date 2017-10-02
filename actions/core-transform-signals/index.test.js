@@ -96,7 +96,7 @@ describe('core-transform', () => {
     const config = {
       messages: [
         {
-          '$intent': 'hello',
+          '$intent': 'general:hello',
           value: [
             {
               '$signal2': 'foo',
@@ -129,7 +129,7 @@ describe('core-transform', () => {
       output: {
         channel: 'testchannel',
         user: 'abcdefg',
-        intent: '$intent:hello $signal2:foo',
+        intent: '$intent:general:hello $signal2:foo',
         context: {
           name: 'Egon'
         }
