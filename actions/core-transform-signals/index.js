@@ -71,10 +71,11 @@ exports.main = (params) => {
       const findBestMatch = (messages, intents) => {
         const signals = _
           .chain(intents)
-          .map(signal => _.split(signal, ':', 2))
+          .map(signal => _.split(signal, ':'))
           .filter(signal => {
-            return _.size(signal) === 2
+            return _.size(signal) < 2
           })
+          .map(signal => _.concat([signal[0]], [ _.join(_.tail(signal), ':') ]))
           .fromPairs()
           .value();
 

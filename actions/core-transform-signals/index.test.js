@@ -23,15 +23,26 @@ describe('core-transform', () => {
       messages: [
         {
           '$intent': 'hello',
-          '$signal2': 'foo',
-          value: {
-            text: 'Hello {{{output.context.name}}}'
-          }
+          value: [
+            {
+              '$intent': 'hello',
+              '$signal2': 'foo',
+              value: {
+                text: 'Hello {{{output.context.name}}}'
+              }
+            },
+            {
+              '$intent': 'blabla',
+              value: {
+                text: 'Not such a good ranking'
+              }
+            }
+          ]
         },
         {
-          '$intent': 'blabla',
+          '$intent': 'foo',
           value: {
-            text: 'Not such a good ranking'
+            text: 'Fooo Baar'
           }
         }
       ],
