@@ -78,6 +78,8 @@ exports.main = (params) => {
           .fromPairs()
           .value();
 
+        console.log(JSON.stringify(signals));
+
         const ranking = _
           .chain(messages)
           .filter(message => {
@@ -96,6 +98,8 @@ exports.main = (params) => {
           .sortBy(['count'])
           .reverse()
           .value();
+
+        console.log(JSON.stringify(ranking));
 
         if (_.size(ranking) > 0 && _.size(signals) > 0) {
           const bestMatch = _.sample(_.filter(ranking, { count: ranking[0].count })).message;
