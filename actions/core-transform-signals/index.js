@@ -98,7 +98,7 @@ exports.main = (params) => {
           .reverse()
           .value();
 
-        if (_.size(ranking) > 0 && _.size(signals) > 0) {
+        if (_.size(ranking) > 0 && _.size(signals) > 0 && ranking[0].count > 0) {
           const bestMatch = _.sample(_.filter(ranking, { count: ranking[0].count })).message;
 
           if (_.isArray(bestMatch.value)) {
