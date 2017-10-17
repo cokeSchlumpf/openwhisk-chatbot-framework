@@ -116,8 +116,7 @@ exports.main = (params) => {
               return call(_.concat(
                 [
                   { typing_on: true },
-                  { wait: message.wait },
-                  { typing_off: true }
+                  { wait: message.wait }
                 ], remaining));
             } else {
               return new Promise((resolve, reject) => {
