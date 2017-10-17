@@ -151,11 +151,7 @@ exports.main = (params) => {
                   }
                 })
               } else {
-                if (_.size(remaining) > 0) {
-                  return call(remaining);
-                } else {
-                  return Promise.resolve(payload);
-                }
+                return call(remaining);
               }
             })
             .catch(error => {
