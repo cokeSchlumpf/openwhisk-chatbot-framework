@@ -97,6 +97,10 @@ exports.main = (params) => {
         const message = _.head(messages);
         const remaining = _.tail(messages);
 
+        if (!message) {
+          return Promise.resolve(payload);
+        }
+
         if (_.isObject(message) && message.wait) {
           const milliseconds = ms(message.wait);
 
