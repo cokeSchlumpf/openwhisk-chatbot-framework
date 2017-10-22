@@ -306,4 +306,56 @@ describe('core-transform', () => {
         chai.expect(result.result.output.message[3].typing_off).to.be.true;
       });
   });
+
+  it('transoforms signals to a message', () => {
+    // create stubs for openwhisk calls
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve(({
+        statusCode: 200,
+        result: JSON.parse(require('fs').readFileSync('./test.messages.json', 'utf-8'))
+      })));
+
+    // mock openwhisk action calls to return successful results
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      messages: {
+        "$action": 'foo/bar'
+      },
+      openwhisk: {
+        package: 'testpackage'
+      }
+    }
+
+    const payload = {
+      id: '123456',
+      conversationcontext: {
+        user: {
+          _id: '1234abcd',
+          testchannel_id: 'abcdefg'
+        }
+      },
+      output: {
+        channel: 'testchannel',
+        intent: '$intent:itinerary_search:destination_propose',
+        user: 'abcdefg',
+        context: {
+          name: 'Egon'
+        }
+      }
+    }
+
+    requireMock.reRequire('openwhisk');
+    requireMock.reRequire('serverless-botpack-lib');
+
+    return requireMock.reRequire('./index').main({ payload, config })
+      .then(result => {
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('foo/bar');
+        chai.expect(result.result.output.message).to.equal('Das beste Reiseziel hängt immer etwas von der Reisezeit ab, weißt du denn schon wann du reisen möchtest?');
+      });
+  });
 });

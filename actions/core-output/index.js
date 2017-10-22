@@ -57,6 +57,17 @@ exports.main = (params) => {
     return Promise.resolve(params);
   }
 
+  const generateMessageHistory = (payload) => {
+    const message = _.get(payload, 'output.intent');
+    const sent = _.get(payload, 'conversationcontext.sent_messages', []);
+
+    if (message) {
+      _.set(payload, 'conversationcontext.sent_messages', _.concat([ message ], sent));
+    }
+
+    return Promise.resolve(payload);
+  }
+
   const generateMessage = (payload) => {
     const transformer = _.get(params, 'config.messages_transformer', `${_.get(params.config, 'openwhisk.package')}/core-transform`)
     const invokeParams = {
@@ -211,6 +222,7 @@ exports.main = (params) => {
 
   return enrichParams()
     .then(params => bot.util.validatePayload(params.payload, 'OUTPUT'))
+    .then(generateMessageHistory)
     .then(generateMessage)
     .then(callOutputConnector)
     .then(archiveOutput)

@@ -35,7 +35,10 @@ describe('core-output', () => {
               facebook_id: '1234',
               name: 'Egon Olsen'
             },
-            foo: 'bar'
+            foo: 'bar',
+            sent_messages: [
+              '#hello'
+            ]
           },
           output: {
             channel: 'facebook',
@@ -112,6 +115,7 @@ describe('core-output', () => {
         chai.expect(invokeStub.getCall(2).args[0].name).to.equal('testpackage/core-contextpersist');
         chai.expect(invokeStub.getCall(2).args[0].params.payload).to.exist;
         chai.expect(invokeStub.getCall(2).args[0].params.payload.output.sent[0].message).to.equal('This is the message');
+        chai.expect(invokeStub.getCall(2).args[0].params.payload.conversationcontext.sent_messages).to.contain('#hello');
 
         chai.expect(result.statusCode).to.equal(200);
         chai.expect(result.result.id).to.equal('12345');

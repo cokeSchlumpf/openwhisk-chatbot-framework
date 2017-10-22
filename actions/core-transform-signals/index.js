@@ -82,7 +82,13 @@ exports.main = (params) => {
         const ranking = _
           .chain(messages)
           .filter(message => {
-            return _.isUndefined(_.find(signals, (value, signal) => !_.isUndefined(message[signal]) && message[signal] !== value))
+            return _.isUndefined(_.find(signals, (value, signal) => {
+              if (message[signal] && message[signal] != value) {
+                return true;
+              } else {
+                return false;
+              }
+            }))
           })
           .map(message => ({
             count: _.reduce(signals, (count, value, signal) => {
