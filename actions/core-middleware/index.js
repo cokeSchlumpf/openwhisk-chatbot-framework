@@ -85,10 +85,6 @@ exports.main = (params) => {
   return checkPayload(payload)
     .then(payload => enrichPayload(payload))
     .then(payload => processMiddleware(middlewares, payload))
-    .then(payload => {
-      bot.log.info(payload);
-      return payload;
-    })
     .then(result => bot.context.persist(result.payload, true).then(() => result.processed))
     .then(result => ({
       statusCode: 200,
