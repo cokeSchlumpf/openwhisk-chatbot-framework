@@ -226,7 +226,7 @@ exports.main = (params) => {
     .then(generateMessage)
     .then(callOutputConnector)
     .then(archiveOutput)
-    .then(persistContext)
+    // .then(persistContext)
     .then(result => ({
       statusCode: 200,
       result

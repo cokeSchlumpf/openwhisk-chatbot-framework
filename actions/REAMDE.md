@@ -7,14 +7,21 @@ function (doc) {
   if (doc.type === "payload") {
     var input = doc.input !== undefined;
     var channel;
+    var timestamp;
     
     try {
       channel = doc.input ? doc.input.channel : doc.output.sent[0].channel;
     } catch (error) {
       channel = 'n/a'
     }
+
+    try {
+      timestamp = doc.input ? doc.input.timestamp : doc.output.sent[0].timestamp;
+    } catch (error) {
+      timestamo = 0;
+    }
     
-    emit(doc.user, { input: input, channeL: channel });
+    emit([timestamp * -1, doc.user], { input: input, channeL: channel });
   }
 }
 ```
@@ -34,7 +41,7 @@ function (doc) {
 ```javascript
 function (doc) {
   if (doc.type === "conversationcontext") {
-    emit([doc.state && doc.state[0] ? doc.state[0].time : 0, doc.user], [ doc.state && doc.state[0] ? doc.state[0].state : 'n/a' ]); 
+    emit([doc.state && doc.state[0] ? doc.state[0].time * -1 : 0, doc.user], [ doc.state && doc.state[0] ? doc.state[0].state : 'n/a' ]); 
   }
 }
 ```

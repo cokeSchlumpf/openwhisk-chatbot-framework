@@ -77,6 +77,8 @@ exports.main = routes(action => {
                       })
                       .then(() => payload)
                       .catch(error => {
+                        console.log(JSON.stringify(error));
+                        
                         return Promise.reject({
                           statusCode: 503,
                           error: {

@@ -1,0 +1,413 @@
+[
+  {
+    "$intent": "hello",
+    "value": [
+      {
+        "$intent": "hello",
+        "$time_of_day": "sunday_morning",
+        "value": {
+          "text": {
+            "seq": [
+              [
+                "Einen wunderschönen Guten Morgen {{conversationcontext.user.first_name}}",
+                "Guten Morgen {{conversationcontext.user.first_name}}",
+                "Hallo {{conversationcontext.user.first_name}}",
+                "Hoi {{conversationcontext.user.first_name}}"
+              ],
+              {
+                "wait": "2s",
+                "typing": true
+              },
+              [
+                "Bist du gut in den Sonntag gestartet?",
+                "Konntest du heute ausschlafen?",
+                "Ich hoffe du hattest bisher ein schönes Wochenende."
+              ]
+            ]
+          }
+        }
+      },
+      {
+        "$intent": "hello",
+        "$time_of_day": "sunday_afternoon",
+        "value": {
+          "text": {
+            "seq": [
+              [
+                "Hallo {{conversationcontext.user.first_name}}",
+                "Hoi {{conversationcontext.user.first_name}}"
+              ],
+              {
+                "wait": "3s",
+                "typing": true
+              },
+              [
+                "Hast du einen gemütlichen Sonntag Nachmittag?",
+                "Was gibt es besseres als einen gemütlichen Sonntag Nachmittag?",
+                "Ein ruhiger Nachmittag um die nächsten Reiseziele zu finden - Was gibt es denn besseres?"
+              ]
+            ]
+          }
+        }
+      },
+      {
+        "$intent": "hello",
+        "$time_of_day": "sunday_evening",
+        "value": {
+          "text": {
+            "seq": [
+              [
+                "Einen wunderschönen Guten Abend {{conversationcontext.user.first_name}}",
+                "Guten Abend {{conversationcontext.user.first_name}}",
+                "Hallo {{conversationcontext.user.first_name}}",
+                "Hoi {{conversationcontext.user.first_name}}"
+              ],
+              {
+                "wait": "3s",
+                "typing": true
+              },
+              [
+                "Hast du Lust deine nächste Reise zu planen? Mit dem nächsten Urlaub vor Augen wird der Start in die Woche morgen früh viel einfacher."
+              ]
+            ]
+          }
+        }
+      },
+      {
+        "$intent": "hello",
+        "$time_of_day": "evening",
+        "value": {
+          "text": {
+            "seq": [
+              [
+                "Einen wunderschönen Guten Abend {{conversationcontext.user.first_name}}",
+                "Guten Abend {{conversationcontext.user.first_name}}",
+                "Hallo {{conversationcontext.user.first_name}}",
+                "Hoi {{conversationcontext.user.first_name}}"
+              ],
+              {
+                "wait": "3s",
+                "typing": true
+              },
+              [
+                "Hast du einen gemütlich Abend?",
+                "Was gibt es besseres als am Abend an die nächste Reise zu denken?",
+                "Ein ruhiger Abend, und dabei über die nächste Reise nachdenken, was gibt es besseres?",
+                "Möchtest du den Abend mit mir verbringen?"
+              ]
+            ]
+          }
+        }
+      },
+      {
+        "$intent": "hello",
+        "value": {
+          "text": "Hallo {{conversationcontext.user.first_name}}!"
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "entry_points:first_contact",
+    "value": {
+      "text": {
+        "seq": [
+          [
+            "Du schreibst mir zum ersten mal :)",
+            "Wir kennen uns noch nicht, oder?"
+          ],
+          {
+            "wait": "2s",
+            "typing": true
+          },
+          [
+            "Mein Name ist Doody. Ich kann dich bei der Suche und Buchung deiner nächsten Kreuzfahrt unterstützen.",
+            "Darf ich mich vorstellen? Mein Name ist Doody. Wenn du Hilfe benötigst eine Kreuzfahrt für deinen nächsten Urlaub zu finden und zu buchen, bin ich für dich da.",
+            "Du sprichst mit Doody. Gemeinsam können wir die richtige Kreuzfahrt für dich finden und ich helfe dir beim buchen, wenn du magst."
+          ],
+          {
+            "wait": "2s",
+            "typing": true
+          },
+          [
+            "Falls ich dir mal nicht weiter helfen kann, kann ich dein Anliegen auf deinen Wunsch an ein Reisebüro weiterleiten.",
+            "Sollte ich einmal nicht mehr weiter wissen, können wir ein Reisebüro aus deiner Nähe in unsere Konversation einbezihen."
+          ],
+          {
+            "wait": "2s",
+            "typing": true
+          },
+          [
+            "Während deiner Reise können wir auch miteinander schreiben. Ich gebe dir Tipps was du an den einzelnen Stationen deiner Reise unternehmen kannst.",
+            "Auch während deiner Reise bin ich für dich da. Hast du Fragen oder suchst nach Tipps während deines Urlaubs, schreib mich einfach an."
+          ],
+          {
+            "wait": "2s",
+            "typing": true
+          },
+          [
+            "Wie kann ich dir heute helfen?",
+            "Was möchtest du heute tun?",
+            "Möchtest du, dass wir gemeinsam eine Reise für dich finden?",
+            "Sollen wir mal schauen welche Reise zu dir passt?"
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "$intent": "itinerary_search:ask_for_destination",
+    "value": [
+      {
+        "$intent": "itinerary_search:ask_for_destination",
+        "value": {
+          "text": [
+            "Weißt du denn wo es hingehen soll?",
+            "Hast du schon eine Idee in welcher Region du eine Kreuzfahrt machen möchtest?",
+            "Hast du Präferenzen wo deine Reise sein soll?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:ask_for_cabin",
+    "value": [
+      {
+        "$intent": "itinerary_search:ask_for_cabin",
+        "value": {
+          "text": [
+            "Wichtig bei einer Kreuzfahrt ist die Auswahl der Kabine. Hast du da schon Vorstellungen?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:ask_for_duration",
+    "value": [
+      {
+        "$intent": "itinerary_search:ask_for_duration",
+        "value": {
+          "text": [
+            "Wie lange soll denn deine Kreuzfahrt sein?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:ask_for_period",
+    "value": [
+      {
+        "$intent": "itinerary_search:ask_for_period",
+        "value": {
+          "text": [
+            "Wann möchtest du denn reisen?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:cabin_any",
+    "value": [
+      {
+        "$intent": "itinerary_search:cabin_any",
+        "value": {
+          "text": [
+            "Dann suchen wir erst einmal alle Kabinen, manchmal gibt es auch überraschend günstige Balkonkabinen."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:cabin_dontknow",
+    "value": [
+      {
+        "$intent": "itinerary_search:cabin_dontknow",
+        "value": {
+          "text": [
+            "Es gibt verschiedene Kabinen-Kategorien ..."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:cabin_propose",
+    "value": [
+      {
+        "$intent": "itinerary_search:cabin_dontknow",
+        "value": {
+          "text": [
+            "Es gibt verschiedene Kabinen-Kategorien. Ich nutze meistens eine Balkonkabine."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:destination_any",
+    "value": [
+      {
+        "$intent": "itinerary_search:destination_any",
+        "value": {
+          "text": [
+            "Ok, dir ist es erst einmal egal wo es hingeht. Weißt du denn schon wann du reisen möchtest?",
+            "Gut, dann lassen wir den Zeitraum erst einmal außen vor. Weißt du wann du reisen möchtest?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:destination_dontknow",
+    "value": [
+      {
+        "$intent": "itinerary_search:destination_dontknow",
+        "value": {
+          "text": [
+            "Im Sommer ist das Mittelmeer recht schön, in der Karibik ist es vor allem im Winter nicht schlecht?",
+            "Das beste Reiseziel hängt immer etwas von der Reisezeit ab, weißt du denn schon wann du reisen möchtest?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:destination_propose",
+    "value": [
+      {
+        "$intent": "itinerary_search:destination_propose",
+        "value": {
+          "text": [
+            "Im Sommer ist das Mittelmeer recht schön, in der Karibik ist es vor allem im Winter nicht schlecht?",
+            "Das beste Reiseziel hängt immer etwas von der Reisezeit ab, weißt du denn schon wann du reisen möchtest?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:duration_any",
+    "value": [
+      {
+        "$intent": "itinerary_search:duration_any",
+        "value": {
+          "text": [
+            "Ok, dann suche ich verschieden lange Reisen für dich heraus."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:duration_dontknow",
+    "value": [
+      {
+        "$intent": "itinerary_search:duration_dontknow",
+        "value": {
+          "text": [
+            "Naja, es gibt sehr unterschiedliche Reisen von 3 bis über 150 Tage."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:duration_propose",
+    "value": [
+      {
+        "$intent": "itinerary_search:duration_propose",
+        "value": {
+          "text": [
+            "Wenn du das erste mal auf einer Kreuzfahrt bist, dann ist eine Woche schon einmal sehr gut. Bla Bla bla ..."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:period_any",
+    "value": [
+      {
+        "$intent": "itinerary_search:period_any",
+        "value": {
+          "text": [
+            "Wenn dir der Zeitraum egal ist, ist das spitze. So können wir die schönste Route zum besten Preis für dich finden.",
+            "Ok, dann sind wir im Zeitraum nicht eingeschränkt."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:period_dontknow",
+    "value": [
+      {
+        "$intent": "itinerary_search:period_dontknow",
+        "value": {
+          "text": [
+            "Dann schauen wir erst einmal ohne konkretes Datum.",
+            "Ok, dann sind wir im Zeitraum nicht eingeschränkt."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:period_propose",
+    "value": [
+      {
+        "$intent": "itinerary_search:period_propose",
+        "value": {
+          "text": [
+            "Also ich finde für Urlaub ist immer die richtige Zeit :)"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$intent": "itinerary_search:search_start",
+    "value": [
+      {
+        "$intent": "itinerary_search:search_start",
+        "value": {
+          "text": [
+            "Prima, du möchtest eine Reise suchen, dann legen wir mal los.",
+            "Sehr gut, dann lass uns mal schauen was wir für dich finden."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$action": "typing_on",
+    "$action_duration": "3s",
+    "value": {
+      "text": {
+        "seq": [
+          {
+            "wait": "3s",
+            "typing": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$action": "typing_on",
+    "value": {
+      "text": {
+        "seq": [
+          {
+            "typing_on": true
+          }
+        ]
+      }
+    }
+  }
+]
