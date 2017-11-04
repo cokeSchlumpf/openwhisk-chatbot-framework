@@ -35,43 +35,55 @@ exports.main = (params) => {
     const remaining = _.tail(middlewares);
 
     if (middleware) {
+      const async = middleware.async || false;
+
       const invokeParams = {
         name: middleware.action,
-        blocking: true,
-        result: true,
+        blocking: !async,
+        result: !async,
         params: _.assign({}, { payload }, middleware.parameters || {})
       };
 
       return ow.actions.invoke(invokeParams)
         .then(result => {
-          const payload = _.get(result, 'payload');
-          const statusCode = _.get(result, 'statusCode');
+          if (async) {
+            return processMiddleware(remaining, payload)
+              .then(result => {
+                return {
+                  processed: _.concat([middleware.action], result.processed),
+                  payload: result.payload
+                };
+              });
+          } else {
+            const payload = _.get(result, 'payload');
+            const statusCode = _.get(result, 'statusCode');
 
-          switch (statusCode) {
-            case 204: // No content, done
-              return Promise.resolve({
-                processed: [middleware.action],
-                payload: payload
-              });
-            case 200:
-              return checkPayload(payload, middleware.action)
-                .then(payload => processMiddleware(remaining, payload))
-                .then(result => {
-                  return {
-                    processed: _.concat([middleware.action], result.processed),
-                    payload: result.payload
-                  };
+            switch (statusCode) {
+              case 204: // No content, done
+                return Promise.resolve({
+                  processed: [middleware.action],
+                  payload: payload
                 });
-            default:
-              return Promise.reject({
-                statusCode: 400,
-                error: {
-                  message: `The middleare action '${middleware.action}' returned no valid status code: '${statusCode}'.`,
-                  parameters: {
-                    payload
+              case 200:
+                return checkPayload(payload, middleware.action)
+                  .then(payload => processMiddleware(remaining, payload))
+                  .then(result => {
+                    return {
+                      processed: _.concat([middleware.action], result.processed),
+                      payload: result.payload
+                    };
+                  });
+              default:
+                return Promise.reject({
+                  statusCode: 400,
+                  error: {
+                    message: `The middleare action '${middleware.action}' returned no valid status code: '${statusCode}'.`,
+                    parameters: {
+                      payload
+                    }
                   }
-                }
-              });
+                });
+            }
           }
         });
     } else {
