@@ -76,14 +76,14 @@ The result of the action should have the following structure:
 
 ```json
 {
-  statusCode: 200,
-  input: {
-    user: '<USER_ID>',
-    message: 'The message which was received.'
+  "statusCode": 200,
+  "input": {
+    "user": "<USER_ID>",
+    "message": "The message which was received."
   },
-  response: {
-    statusCode: 200,
-    body: { },
+  "response": {
+    "statusCode": 200,
+    "body": { },
   }
 }
 ```
@@ -92,20 +92,20 @@ Multiple inputs, are also allowed:
 
 ```json
 {
-  statusCode: 200,
-  input: [
+  "statusCode": 200,
+  "input": [
     {
-      user: '<USER_ID>',
-      message: 'The message which was received.'
+      "user": "<USER_ID>",
+      "message": "The message which was received."
     },
     {
-      user: '<USER_ID>',
-      message: 'The message which was received.'
+      "user": "<USER_ID>",
+      "message": "The message which was received."
     }
   ],
-  response: {
-    statusCode: 200,
-    body: { },
+  "response": {
+    "statusCode": 200,
+    "body": { },
   }
 }
 ```
