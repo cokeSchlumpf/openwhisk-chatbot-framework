@@ -61,12 +61,12 @@ An input-connector action will receive the following parameters:
 ```json
 {
   "request": {
-    "body": { }, // The parsed HTTP request, usually a JSON object
-    "url": "http://some.url", // The target url of the HTTP request
-    "method": "POST", // The method of the HTTP request
-    "query": "?param=foo" // The query string of the request
+    "body": { },
+    "url": "http://some.url",
+    "method": "POST",
+    "query": "?param=foo"
   },
-  // Additional parameters which are set in the configuration
+  "foo": "Additional parameters which are set in the configuration"
 }
 ```
 
@@ -82,8 +82,8 @@ The result of the action should have the following structure:
     message: 'The message which was received.'
   },
   response: {
-    statusCode: 200, // the HTTP response status code
-    body: { }, // an optional response body which should be sent as HTTP response
+    statusCode: 200,
+    body: { },
   }
 }
 ```
@@ -104,16 +104,16 @@ Multiple inputs, are also allowed:
     }
   ],
   response: {
-    statusCode: 200, // the HTTP response status code
-    body: { }, // an optional response body which should be sent as HTTP response
+    statusCode: 200,
+    body: { },
   }
 }
 ```
 
 The input connector may return in three different ways:
 
-**Accepted (statusCode: 200):** Like in the example above, the connector detects the request as valid for its channel and returns the received messages and user ids.
+**Accepted (statusCode: 200):** Like in the example above, the connector detects the request as valid for its channel and returns the received messages and user ids. Also if `statusCode` is set to `200`, a `response` object is required. The `response` object must at least contain a `statusCode` which is sent as HTTP response to the original HTTP request. Optionally a `body` can be defined which is sent in the response body.
 
-**Accepted (statusCode: 204):** The connector detects the request as a valid request for its channel, but the request does not contain any messages. This may be required for verification calls, healthchecks, etc. In that case the `input` can be undefined or empty.
+**Accepted (statusCode: 204):** The connector detects the request as a valid request for its channel, but the request does not contain any messages. This may be required for verification calls, healthchecks, etc. In that case the `input` can be undefined or empty. Like for `statusCode` `200` a `response` object including a `statusCode` and an optional `body` needs to be returned.
 
 **Not applicable (statusCode: 422):** If the connector does not detect a valid request, it should return a statusCode of `422`.
