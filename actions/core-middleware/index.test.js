@@ -11,76 +11,19 @@ const debug = (result) => {
 /* 
  * Some general notes ... 
  */
+
 describe('core-middleware', () => {
-  it('calls all configured middleware components', () => {
-    // create stubs for actual functions
+  it('calls the configured middleware components in the specified order', () => {
     const invokeStub = sinon.stub()
-      .onCall(0).returns(Promise.resolve({
-        statusCode: 200,
-        result: {
-          id: '123',
-          input: {
-            channel: 'facebook',
-            user: '1234',
-            message: 'foo'
-          },
-          conversationcontext: {
-            user: {
-              _id: '1234',
-              'facebook_id': '123456'
-            }
-          }
-        }
-      }))
-      .onCall(1).returns(Promise.resolve({
-        statusCode: 200,
-        payload: {
-          id: '123',
-          input: {
-            channel: 'facebook',
-            user: '1234',
-            message: 'foo'
-          },
-          conversationcontext: {
-            user: {
-              _id: '1234',
-              'facebook_id': '123456'
-            }
-          }
-        }
-      }))
-      .onCall(2).returns(Promise.resolve({
-        statusCode: 200,
-        payload: {
-          id: '123',
-          input: {
-            channel: 'facebook',
-            user: '1234',
-            message: 'foo'
-          },
-          conversationcontext: {
-            user: {
-              _id: '1234',
-              'facebook_id': '123456'
-            }
-          }
-        }
-      }))
-      .onCall(3).returns(Promise.resolve({
-        statusCode: 200
-      }))
-      .onCall(4).returns(Promise.resolve({
-        statusCode: 200
-      }));
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 2 } }));
 
-    // mock openwhisk action calls to return successful results
     requireMock('openwhisk', () => ({
       actions: {
         invoke: invokeStub
       }
     }));
 
-    // sample configuration used for the test
     const config = {
       middleware: [
         {
@@ -88,195 +31,37 @@ describe('core-middleware', () => {
         },
         {
           action: 'package/action_01'
-        }
-      ],
-      openwhisk: {
-        package: 'testpackage'
-      }
+        },
+      ]
     }
 
-    const payload = {
-      id: '12345',
-      input: {
-        channel: 'facebook',
-        user: '1234',
-        message: 'foo'
-      }
-    }
+    const payload = { result: 0 }
 
     requireMock.reRequire('openwhisk');
-    requireMock.reRequire('serverless-botpack-lib');
 
-    return requireMock.reRequire('./index').main({ payload, config })
+    return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('testpackage/core-contextload');
-        chai.expect(invokeStub.getCall(0).args[0].params.user.facebook_id).to.equal('1234');
-        chai.expect(result.result).to.have.lengthOf(2);
+        chai.expect(invokeStub.callCount).to.equal(2);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_01');
+
+        chai.expect(result.payload.result).to.equal(2);
       });
   });
 
-  it('calls all configured middleware components, asynchronuous middleware will be called without waiting for the result', () => {
-    // create stubs for actual functions
+  it('stops processing on an error', () => {
     const invokeStub = sinon.stub()
-      .onCall(0).returns(Promise.resolve({
-        statusCode: 200,
-        result: {
-          id: '123',
-          input: {
-            channel: 'facebook',
-            user: '1234',
-            message: 'foo'
-          },
-          conversationcontext: {
-            user: {
-              _id: '1234',
-              'facebook_id': '123456'
-            }
-          }
-        }
-      }))
-      .onCall(1).returns(Promise.resolve({
-        statusCode: 200,
-        payload: {
-          id: '123',
-          input: {
-            channel: 'facebook',
-            user: '1234',
-            message: 'foo'
-          },
-          conversationcontext: {
-            user: {
-              _id: '1234',
-              'facebook_id': '123456'
-            }
-          }
-        }
-      }))
-      .onCall(2).returns(Promise.resolve({
-        statusCode: 200
-      }))
-      .onCall(3).returns(Promise.resolve({
-        statusCode: 200,
-        payload: {
-          id: '123',
-          input: {
-            channel: 'facebook',
-            user: '1234',
-            message: 'foo'
-          },
-          conversationcontext: {
-            user: {
-              _id: '1234',
-              'facebook_id': '123456'
-            }
-          }
-        }
-      }))
-      .onCall(4).returns(Promise.resolve({
-        statusCode: 200
-      }))
-      .onCall(5).returns(Promise.resolve({
-        statusCode: 200
-      }));
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 500, error: { message: 'foo' } }))
+      .onCall(2).returns(Promise.resolve({ statusCode: 200, payload: { result: 3 } }));
 
-    // mock openwhisk action calls to return successful results
     requireMock('openwhisk', () => ({
       actions: {
         invoke: invokeStub
       }
     }));
 
-    // sample configuration used for the test
-    const config = {
-      middleware: [
-        {
-          action: 'package/action_00'
-        },
-        {
-          action: 'package/action_async',
-          async: true
-        },
-        {
-          action: 'package/action_01'
-        }
-      ],
-      openwhisk: {
-        package: 'testpackage'
-      }
-    }
-
-    const payload = {
-      id: '12345',
-      input: {
-        channel: 'facebook',
-        user: '1234',
-        message: 'foo'
-      }
-    }
-
-    requireMock.reRequire('openwhisk');
-    requireMock.reRequire('serverless-botpack-lib');
-
-    return requireMock.reRequire('./index').main({ payload, config })
-      .then(result => {
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('testpackage/core-contextload');
-        chai.expect(invokeStub.getCall(0).args[0].params.user.facebook_id).to.equal('1234');
-        chai.expect(invokeStub.getCall(1).args[0].result).to.be.true;
-        chai.expect(invokeStub.getCall(1).args[0].blocking).to.be.true;
-        chai.expect(invokeStub.getCall(2).args[0].result).to.be.false;
-        chai.expect(invokeStub.getCall(2).args[0].blocking).to.be.false;
-        chai.expect(invokeStub.getCall(3).args[0].result).to.be.true;
-        chai.expect(invokeStub.getCall(3).args[0].blocking).to.be.true;
-        chai.expect(result.result).to.have.lengthOf(3);
-      });
-  });
-
-  it('stops processing if middleware returns 203', () => {
-    // create stubs for actual functions
-    const invokeStub = sinon.stub()
-      .onCall(0).returns(Promise.resolve({
-        statusCode: 200,
-        result: {
-          id: '123',
-          input: {
-            channel: 'facebook',
-            user: '1234',
-            message: 'foo'
-          },
-          conversationcontext: {
-            user: {
-              _id: '1234',
-              'facebook_id': '123456'
-            }
-          }
-        }
-      }))
-      .onCall(1).returns(Promise.resolve({
-        statusCode: 204,
-        payload: {
-          id: '123',
-          input: {
-            channel: 'facebook',
-            user: '1234',
-            message: 'foo'
-          }
-        }
-      }))
-      .onCall(2).returns(Promise.resolve({
-        statusCode: 200
-      }))
-      .onCall(3).returns(Promise.resolve({
-        statusCode: 200
-      }));
-
-    // mock openwhisk action calls to return successful results
-    requireMock('openwhisk', () => ({
-      actions: {
-        invoke: invokeStub
-      }
-    }));
-
-    // sample configuration used for the test
     const config = {
       middleware: [
         {
@@ -284,95 +69,123 @@ describe('core-middleware', () => {
         },
         {
           action: 'package/action_01'
-        }
-      ],
-      openwhisk: {
-        package: 'testpackage'
-      }
-    }
-
-    const payload = {
-      id: '123',
-      input: {
-        channel: 'facebook',
-        user: '1234',
-        message: 'foo'
-      }
-    }
-
-    requireMock.reRequire('openwhisk');
-    requireMock.reRequire('serverless-botpack-lib');
-
-    return requireMock.reRequire('./index').main({ payload, config })
-      .then(result => {
-        chai.expect(result.statusCode).to.equal(200);
-        chai.expect(result.result).to.have.lengthOf(1);
-      });
-  });
-
-  it('stops and returns an error if an action returns an invalid response', () => {
-    // create stubs for actual functions
-    const invokeStub = sinon.stub()
-      .onCall(0).returns(Promise.resolve({
-        statusCode: 200,
-        result: {
-          id: '123',
-          input: {
-            channel: 'facebook',
-            user: '1234',
-            message: 'foo'
-          },
-          conversationcontext: {
-            user: {
-              _id: '1234',
-              'facebook_id': '123456'
-            }
-          }
-        }
-      }))
-      .onCall(1).returns(Promise.resolve({
-        foo: 'bar'
-      }))
-      .onCall(2).returns(Promise.resolve())
-      .onCall(3).returns(Promise.resolve())
-      .onCall(4).returns(Promise.resolve());
-
-    // mock openwhisk action calls to return successful results
-    requireMock('openwhisk', () => ({
-      actions: {
-        invoke: invokeStub
-      }
-    }));
-
-    // sample configuration used for the test
-    const config = {
-      middleware: [
-        {
-          action: 'package/action_00'
         },
         {
-          action: 'package/action_01'
+          action: 'package/action_02'
         }
       ]
     }
 
-    const payload = {
-      id: '1234',
-      input: {
-        channel: 'facebook',
-        user: '1234',
-        message: 'foo'
-      }
-    }
+    const payload = { result: 0 }
 
     requireMock.reRequire('openwhisk');
-    requireMock.reRequire('serverless-botpack-lib');
 
-    return requireMock.reRequire('./index').main({ payload, config })
-      .then(result => {
-        chai.expect(result).to.have.property('error');
-        chai.expect(result.statusCode).to.equal(400);
-        chai.expect(result.error.message).to.contain('package/action_00');
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {        
+        chai.expect(invokeStub.callCount).to.equal(2);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_01');
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(1);
+
+        chai.expect(result.payload.result).to.equal(1);
+      });
+  });
+
+  it('stops processing on an error, but executes actions marked with final', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 500, error: { message: 'foo' } }))
+      .onCall(2).returns(Promise.resolve({ statusCode: 200, payload: { result: 4 } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      middleware: [
+        {
+          action: 'package/action_00'
+        },
+        {
+          action: 'package/action_01'
+        },
+        {
+          action: 'package/action_02'
+        },
+        {
+          action: 'package/action_03',
+          properties: {
+            final: true
+          }
+        }
+      ]
+    }
+
+    const payload = { result: 0 }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {        
+        chai.expect(invokeStub.callCount).to.equal(3);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_01');
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(1);
+        chai.expect(invokeStub.getCall(2).args[0].name).to.equal('package/action_03');
+        chai.expect(invokeStub.getCall(2).args[0].params.payload.result).to.equal(1);
+
+        chai.expect(result.payload.result).to.equal(4);
+      });
+  });
+
+  it('continues processing on an error if acton is set to do so', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 500, error: { message: 'foo' } }))
+      .onCall(2).returns(Promise.resolve({ statusCode: 200, payload: { result: 3 } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      middleware: [
+        {
+          action: 'package/action_00'
+        },
+        {
+          action: 'package/action_01',
+          properties: {
+            continue_on_error: true
+          }
+        },
+        {
+          action: 'package/action_02'
+        }
+      ]
+    }
+
+    const payload = { result: 0 }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {        
+        chai.expect(invokeStub.callCount).to.equal(3);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_01');
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(1);
+        chai.expect(invokeStub.getCall(2).args[0].name).to.equal('package/action_02');
+        chai.expect(invokeStub.getCall(2).args[0].params.payload.result).to.equal(1);
+
+        chai.expect(result.payload.result).to.equal(3);
       });
   });
 });

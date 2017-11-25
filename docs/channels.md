@@ -117,3 +117,7 @@ The input connector may return in three different ways:
 **Accepted (statusCode: 204):** The connector detects the request as a valid request for its channel, but the request does not contain any messages. This may be required for verification calls, healthchecks, etc. In that case the `input` can be undefined or empty. Like for `statusCode` `200` a `response` object including a `statusCode` and an optional `body` needs to be returned.
 
 **Not applicable (statusCode: 422):** If the connector does not detect a valid request, it should return a statusCode of `422`.
+
+## Output connectors
+
+**TODO**

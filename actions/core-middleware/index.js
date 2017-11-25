@@ -1,107 +1,203 @@
 const _ = require('lodash');
 const openwhisk = require('openwhisk');
-const Validator = require('better-validator');
-const wskbotfwk = require('serverless-botpack-lib');
 
-exports.main = (params) => {
+const context$store = (params) => {
   const ow = openwhisk();
-  const bot = wskbotfwk(params);
 
-  const middlewares = _.get(params, 'config.middleware', []);
-  const payload = _.get(params, 'payload');
+  return Promise.resolve(params);
+}
 
-  const checkPayload = (payload, origin) => {
-    return bot.util
-      .validatePayload(payload, 'INPUT')
-      .catch(error => Promise.reject({
-        statusCode: 400,
+const error = (params) => (error = {}) => {
+  if (error instanceof Error) {
+    console.error(error);
+  }
+
+  _.set(error, 'statusCode', _.get(error, 'statusCode', '500'));
+  _.set(error, 'error.message', _.get(error, 'error.message', 'internal error during action execution'));
+  _.set(error, 'error.params.input', params);
+
+  return Promise.reject(error);
+}
+
+const finalize = ({ payload, context }) => {
+  return Promise.resolve({
+    statusCode: 200,
+    payload: payload,
+    processed: context.processed
+  });
+}
+
+const middleware$callasync = (middleware = {}) => (params = {}) => {
+  const ow = openwhisk();
+
+  const invokeParams = {
+    name: middleware.action,
+    blocking: false,
+    params: _.assign({ payload: params.payload }, _.get(middleware, 'parameters', {}))
+  }
+
+  return ow.actions.invoke(invokeParams)
+    .then(() => {
+      params.context.processed.push({
+        action: middleware.action,
+        async: true,
+        skipped: false,
+        statusCode: 200
+      });
+
+      return Promise.resolve(params);
+    })
+    .catch((error = {}) => {
+      if (error instanceof Error) {
+        console.error(error);
+      }
+
+      const middleware_error = {
+        statusCode: 503,
         error: {
-          message: origin ? `The payload returned by '${origin}' is not valid.` : 'The payload is not valid.',
-          parameters: {
-            payload,
-            validationErrors: error
+          message: `error calling asynchronuous middleware '${middleware.action}'`,
+          params: {
+            cause: error,
+            middleware: middleware
           }
         }
-      }));
-  }
-
-  const enrichPayload = (payload) => {
-    return bot.context
-      .load(payload, { [`${payload.input.channel}_id`]: payload.input.user });
-  }
-
-  const processMiddleware = (middlewares, payload) => {
-    const middleware = _.first(middlewares);
-    const remaining = _.tail(middlewares);
-
-    if (middleware) {
-      const async = middleware.async || false;
-
-      const invokeParams = {
-        name: middleware.action,
-        blocking: !async,
-        result: !async,
-        params: _.assign({}, { payload }, middleware.parameters || {})
       };
 
-      return ow.actions.invoke(invokeParams)
-        .then(result => {
-          if (async) {
-            return processMiddleware(remaining, payload)
-              .then(result => {
-                return {
-                  processed: _.concat([middleware.action], result.processed),
-                  payload: result.payload
-                };
-              });
-          } else {
-            const payload = _.get(result, 'payload');
-            const statusCode = _.get(result, 'statusCode');
-
-            switch (statusCode) {
-              case 204: // No content, done
-                return Promise.resolve({
-                  processed: [middleware.action],
-                  payload: payload
-                });
-              case 200:
-                return checkPayload(payload, middleware.action)
-                  .then(payload => processMiddleware(remaining, payload))
-                  .then(result => {
-                    return {
-                      processed: _.concat([middleware.action], result.processed),
-                      payload: result.payload
-                    };
-                  });
-              default:
-                return Promise.reject({
-                  statusCode: 400,
-                  error: {
-                    message: `The middleare action '${middleware.action}' returned no valid status code: '${statusCode}'.`,
-                    parameters: {
-                      payload
-                    }
-                  }
-                });
-            }
-          }
-        });
-    } else {
-      return Promise.resolve({
-        processed: [],
-        payload: payload
+      params.context.processed.push({
+        action: middleware.action,
+        async: true,
+        error: middleware_error,
+        skipped: false,
+        statusCode: error.statusCode || 503
       });
-    }
+
+      return Promise.reject(middleware_error);
+    });
+}
+
+const middleware$callsync = (middleware = {}) => (params = {}) => {
+  const ow = openwhisk();
+
+  const invokeParams = {
+    name: middleware.action,
+    blocking: true,
+    result: true,
+    params: _.assign({ payload: params.payload }, _.get(middleware, 'parameters', {}))
   }
 
-  return checkPayload(payload)
-    .then(payload => enrichPayload(payload))
-    .then(payload => processMiddleware(middlewares, payload))
-    .then(result => bot.context.persist(result.payload, true).then(() => result.processed))
-    .then(result => ({
-      statusCode: 200,
-      result
-    }))
-    .then(bot.util.defaultAsyncResultHandler)
-    .catch(bot.util.defaultAsyncResultHandler);
-};
+  return ow.actions.invoke(invokeParams)
+    .then((result = {}) => {
+      if (!_.isEqual(result.statusCode, 200) && !_.isEqual(result.statusCode, 204)) return Promise.reject(result);
+
+      params.context.processed.push({
+        action: middleware.action,
+        async: false,
+        skipped: false,
+        statusCode: result.statusCode
+      });
+
+      _.set(params, 'payload', _.get(result, 'payload', {}));
+
+      return Promise.resolve(params);
+    })
+    .catch((error = {}) => {
+      if (error instanceof Error) {
+        console.error(error);
+      }
+
+      const middleware_error = {
+        statusCode: 503,
+        error: {
+          message: `error calling middleware '${middleware.action}'`,
+          params: {
+            cause: error,
+            middleware: middleware
+          }
+        }
+      };
+
+      params.context.processed.push({
+        action: middleware.action,
+        async: false,
+        error: middleware_error,
+        skipped: false,
+        statusCode: error.statusCode || 503
+      });
+
+      return Promise.reject(middleware_error);
+    });
+}
+
+const middleware$call = (params = {}, middleware = {}) => {
+  const async = _.get(middleware, 'async', false);
+  
+  return Promise.resolve(params)
+    .then(async ? middleware$callasync(middleware) : middleware$callsync(middleware));
+}
+
+const middleware$process = (params) => {
+  _.set(params, 'context.processed', []);
+
+  return middleware$process$recursive(params);
+}
+
+const middleware$process$recursive = (params, middleware_index = 0, accumulator = 'SUCCESS') => {
+  const middlewares = _.get(params, 'config.middleware', []);
+
+  if (middleware_index >= _.size(middlewares)) {
+    return Promise.resolve(params);
+  } else {
+    const middleware = middlewares[middleware_index];
+    const continue_on_error = _.get(middleware, 'properties.continue_on_error', false);
+    const final = _.get(middleware, 'properties.final', false);
+
+    let promise;
+
+    switch (accumulator) {
+      case 'SUCCESS':
+      case 'FAILED_CONTINUE':
+        promise = middleware$call(params, middleware);
+        break;
+      case 'FAILED':
+        if (final) {
+          promise = middleware$call(params, middleware);
+        } else {
+          params.context.processed.push({
+            action: middleware.action,
+            skipped: true
+          });
+          
+          promise = Promise.resolve(params);
+        }
+        break;
+    }
+
+    return promise
+      .then(params => {
+        return middleware$process$recursive(params, middleware_index + 1, accumulator);
+      })
+      .catch(error => {        
+        switch (accumulator) {
+          case 'SUCCESS':
+          case 'FAILED_CONTINUE':
+            if (continue_on_error) {
+              return Promise.resolve(middleware$process$recursive(params, middleware_index + 1, 'FAILED_CONTINUE'));
+            } else {
+              return Promise.resolve(middleware$process$recursive(params, middleware_index + 1, 'FAILED'));
+            }
+          case 'FAILED':
+            return Promise.resolve(middleware$process$recursive(params, middleware_index + 1, accumulator));
+        }
+      });
+  }
+}
+
+exports.main = (params) => {
+  return Promise.resolve(params)
+    .then(middleware$process)
+    .then(result => {
+      return result;
+    })
+    .then(finalize)
+    .catch(error);
+}
