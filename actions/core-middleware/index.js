@@ -1,12 +1,6 @@
 const _ = require('lodash');
 const openwhisk = require('openwhisk');
 
-const context$store = (params) => {
-  const ow = openwhisk();
-
-  return Promise.resolve(params);
-}
-
 const error = (params) => (error = {}) => {
   if (error instanceof Error) {
     console.error(error);
@@ -195,9 +189,6 @@ const middleware$process$recursive = (params, middleware_index = 0, accumulator 
 exports.main = (params) => {
   return Promise.resolve(params)
     .then(middleware$process)
-    .then(result => {
-      return result;
-    })
     .then(finalize)
-    .catch(error);
+    .catch(error(params));
 }

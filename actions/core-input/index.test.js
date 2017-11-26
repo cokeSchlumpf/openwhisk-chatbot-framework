@@ -66,6 +66,7 @@ describe('core-input', () => {
 
     return requireMock.reRequire('./index').main({ __ow_method: 'get', __ow_path: '/', config })
       .then(result => {
+        console.log(JSON.stringify(invokeStub.getCall(2).args[0].params.payload));
         chai.expect(result.statusCode).to.equal(200);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
         chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.input[1].action);
