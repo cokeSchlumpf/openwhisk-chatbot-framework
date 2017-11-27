@@ -1,19 +1,20 @@
 {
-  "name": "core-contextload",
+  "name": "middleware-user-persist",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
-  "description": "An openwhisk action which loads the context from the database for a given user.",
+  "description": "A middleware to persist the user data. This middleware can be called asynchronuous.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha *.test.js"
+    "test": "NODEENV=test mocha *.test.js"
   },
   "dependencies": {
+    "cloudant": "^1.10.0",
     "lodash": "^4.17.4",
-    "openwhisk": "^3.8.0",
-    "serverless-botpack-lib": "^1.0.19"
+    "openwhisk": "^3.7.0"
   },
   "devDependencies": {
+    "acquit": "^0.5.0",
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
     "mock-require": "^2.0.2",
