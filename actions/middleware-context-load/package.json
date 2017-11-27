@@ -1,0 +1,23 @@
+{
+  "name": "middleware-context-load",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
+  "description": "A middleware to load a context for a payload.",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODEENV=test mocha *.test.js"
+  },
+  "dependencies": {
+    "cloudant": "^1.10.0",
+    "lodash": "^4.17.4",
+    "openwhisk": "^3.7.0"
+  },
+  "devDependencies": {
+    "acquit": "^0.5.0",
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0",
+    "mock-require": "^2.0.2",
+    "sinon": "^3.2.1"
+  }
+}

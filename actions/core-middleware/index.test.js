@@ -8,9 +8,6 @@ const debug = (result) => {
   return result;
 }
 
-/* 
- * Some general notes ... 
- */
 describe('core-middleware', () => {
   it('calls the configured middleware components in the specified order', () => {
     const invokeStub = sinon.stub()

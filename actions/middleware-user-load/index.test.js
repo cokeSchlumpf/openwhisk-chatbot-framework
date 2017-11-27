@@ -44,6 +44,9 @@ describe('middleware-user-load', () => {
     requireMock.reRequire('cloudant');
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
       chai.expect(cloudant_find_stub.callCount).to.equal(1);
+
+      chai.expect(cloudant_find_stub.getCall(0).args[0].selector.channel_name_id).to.equal('1234');
+
       chai.expect(result.statusCode).to.equal(200);
       chai.expect(result.payload.input.user).to.equal('1234');
       chai.expect(result.payload.conversationcontext.user._id).to.equal('1234');
