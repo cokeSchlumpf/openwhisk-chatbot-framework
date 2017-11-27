@@ -300,4 +300,8 @@ exports.main = routes(action => {
 
     request$process(params, request, res);
   });
+}, {
+  ignoreProperties: [
+    'config'
+  ]
 });
