@@ -1,9 +1,9 @@
 {
-  "name": "middleware-user-persist",
+  "name": "middleware-context-persist",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
-  "description": "A middleware to persist the user data. This middleware can be called asynchronuous.",
+  "description": "A middleware to persist the payload's context.",
   "main": "index.js",
   "scripts": {
     "test": "NODEENV=test mocha *.test.js"
@@ -13,7 +13,6 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "acquit": "^0.5.0",
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
     "mock-require": "^2.0.2",

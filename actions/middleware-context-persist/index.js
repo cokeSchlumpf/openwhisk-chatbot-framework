@@ -21,43 +21,48 @@ const finalize = ({ context, payload }) => {
   });
 }
 
-const user$persist = (params) => {
+const context$persist = (params) => {
   const url = _.get(params, 'config.cloudant.url');
   const database = _.get(params, 'config.cloudant.database');
 
   const cloudantConfig = { url, plugin: 'promises' };
   const db = cloudantclient(cloudantConfig).db.use(database);
 
-  const user = _.get(params, 'payload.conversationcontext.user', {});
-  const id = user._id;
-  const rev = user._rev;
+  const conversationcontext = _.get(params, 'payload.conversationcontext', {});
+  const id = conversationcontext._id;
+  const rev = conversationcontext._rev;
+  const user_id = _.get(conversationcontext, 'user._id');
+  const conversationcontext_without_user = _.assign({}, conversationcontext, { user: user_id });
+
+
 
   let operation = Promise.resolve();
 
   if (_.isUndefined(id)) {
-    // Create the user in the database
-    operation = db.insert(user)
+    // Create the conversationcontext in the database
+    operation = db.insert(conversationcontext_without_user)
       .then(result => {
-        _.set(user, '_id', result.id);
-        _.set(user, '_rev', result.rev);
+        conversationcontext._id = result.id;
+        conversationcontext._rev = result.rev;
         return result;
       });
   } else if (_.isUndefined(rev)) {
     // Get the current revision id from the database
     operation = db.get(id)
-      .then(user_from_db => {
-        _.set(user, '_rev', user_from_db._rev);
+      .then(conversationcontext_from_db => {
+        conversationcontext._rev = conversationcontext_from_db._rev;
+        conversationcontext_without_user._rev = conversationcontext_from_db._rev;
 
-        return db.insert(user)
+        return db.insert(conversationcontext_without_user)
           .then(result => {
-            _.set(user, '_rev', result.rev);
+            conversationcontext._rev = result.rev;
             return result;
-          });
+          })
       });
   } else {
-    operation = db.insert(user)
+    operation = db.insert(conversationcontext_without_user)
       .then(result => {
-        _.set(user, '_rev', result.rev);
+        conversationcontext._rev = result.rev;
         return result;
       });
   }
@@ -75,10 +80,9 @@ const user$persist = (params) => {
       return Promise.reject({
         statusCode: 503,
         error: {
-          message: 'There was an error updating/ inserting the user in the database.',
+          message: 'There was an error updating/ inserting the conversationcontext in the database.',
           parameters: {
-            error: error,
-            user: user
+            error: error
           }
         }
       });
@@ -86,14 +90,15 @@ const user$persist = (params) => {
 }
 
 const validate = (params) => {
-  const user = _.get(params, 'payload.conversationcontext.user', {});
-
-  if (_.isUndefined(user)) {
+  if (_.isUndefined(_.get(params, 'payload.conversationcontext'))) {
     return Promise.reject({
-      statusCode: 404,
-      error: {
-        message: 'The required parameter `payload.conversationcontext.user` is not defined.'
-      }
+      message: 'The required parameter `payload.conversationcontext` is not set'
+    });
+  }
+
+  if (_.isUndefined(_.get(params, 'payload.conversationcontext.user._id'))) {
+    return Promise.reject({
+      message: 'The required parameter `payload.conversationcontext.user._id` is not set'
     });
   }
 
@@ -103,7 +108,7 @@ const validate = (params) => {
 exports.main = (params) => {
   return Promise.resolve(params)
     .then(validate)
-    .then(user$persist)
+    .then(context$persist)
     .then(finalize)
     .catch(error(params));
 }
