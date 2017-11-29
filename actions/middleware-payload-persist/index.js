@@ -21,46 +21,46 @@ const finalize = ({ context, payload }) => {
   });
 }
 
-const context$persist = (params) => {
+const payload$persist = (params) => {
   const url = _.get(params, 'config.cloudant.url');
   const database = _.get(params, 'config.cloudant.database');
 
   const cloudantConfig = { url, plugin: 'promises' };
   const db = cloudantclient(cloudantConfig).db.use(database);
 
-  const conversationcontext = _.get(params, 'payload.conversationcontext', {});
-  const id = conversationcontext._id;
-  const rev = conversationcontext._rev;
-  const user_id = _.get(conversationcontext, 'user._id');
-  const conversationcontext_without_user = _.assign({}, conversationcontext, { user: user_id });
+  const payload = _.get(params, 'payload', {});
+  const id = payload._id;
+  const rev = payload._rev;
+  const conversationcontext_id = _.get(payload, 'conversationcontext._id');
+  const payload_without_conversationcontext = _.assign({}, payload, { conversationcontext: conversationcontext_id });
 
   let operation = Promise.resolve();
 
   if (_.isUndefined(id)) {
-    // Create the conversationcontext in the database
-    operation = db.insert(conversationcontext_without_user)
+    // Create the user in the database
+    operation = db.insert(payload_without_conversationcontext)
       .then(result => {
-        conversationcontext._id = result.id;
-        conversationcontext._rev = result.rev;
+        payload._id = result.id;
+        payload._rev = result.rev;
         return result;
       });
   } else if (_.isUndefined(rev)) {
     // Get the current revision id from the database
     operation = db.get(id)
-      .then(conversationcontext_from_db => {
-        conversationcontext._rev = conversationcontext_from_db._rev;
-        conversationcontext_without_user._rev = conversationcontext_from_db._rev;
+      .then(payload_from_db => {
+        payload._rev = payload_from_db._rev;
+        payload_without_conversationcontext._rev = payload_from_db._rev;
 
-        return db.insert(conversationcontext_without_user)
+        return db.insert(payload_without_conversationcontext)
           .then(result => {
-            conversationcontext._rev = result.rev;
+            payload._rev = result.rev;
             return result;
-          })
+          });
       });
   } else {
-    operation = db.insert(conversationcontext_without_user)
+    operation = db.insert(payload_without_conversationcontext)
       .then(result => {
-        conversationcontext._rev = result.rev;
+        payload._rev = result.rev;
         return result;
       });
   }
@@ -78,7 +78,7 @@ const context$persist = (params) => {
       return Promise.reject({
         statusCode: 503,
         error: {
-          message: 'There was an error updating/ inserting the conversationcontext in the database.',
+          message: 'There was an error updating/ inserting the payload in the database.',
           parameters: {
             error: error
           }
@@ -87,16 +87,22 @@ const context$persist = (params) => {
     })
 }
 
-const validate = (params) => {
-  if (_.isUndefined(_.get(params, 'payload.conversationcontext'))) {
+const validate = (params = {}) => {
+  if (_.isUndefined(params.payload)) {
     return Promise.reject({
-      message: 'The required parameter `payload.conversationcontext` is not set'
+      statusCode: 404,
+      error: {
+        message: 'There is no payload to persist.'
+      }
     });
   }
 
-  if (_.isUndefined(_.get(params, 'payload.conversationcontext.user._id'))) {
+  if (_.isUndefined(_.get(params, 'payload.conversationcontext._id'))) {
     return Promise.reject({
-      message: 'The required parameter `payload.conversationcontext.user._id` is not set'
+      statusCode: 404,
+      error: {
+        message: 'The required field `payload.conversationcontext._id` is not defined.'
+      }
     });
   }
 
@@ -106,7 +112,7 @@ const validate = (params) => {
 exports.main = (params) => {
   return Promise.resolve(params)
     .then(validate)
-    .then(context$persist)
+    .then(payload$persist)
     .then(finalize)
     .catch(error(params));
 }
