@@ -49,28 +49,20 @@ describe('middleware-user-load', () => {
 
       chai.expect(result.statusCode).to.equal(200);
       chai.expect(result.payload.input.user).to.equal('1234');
-      chai.expect(result.payload.conversationcontext.user._id).to.equal('1234');
       chai.expect(result.payload.conversationcontext.user.channel_id).to.equal('foo');
     });
   });
 
-  it('enriches the payload with the user data, if a new user is detected, the user is created in the database', () => {
+  it('enriches the payload with the new user data, if user not known', () => {
     const cloudant_find_stub = sinon.stub()
       .returns(Promise.resolve({
         docs: []
       }));
 
-    const cloudant_insert_stub = sinon.stub()
-      .returns(Promise.resolve({
-        id: '1234',
-        rev: '1-1234'
-      }));
-
     requireMock('cloudant', () => ({
       db: {
         use: () => ({
-          find: cloudant_find_stub,
-          insert: cloudant_insert_stub
+          find: cloudant_find_stub
         })
       }
     }));
@@ -93,29 +85,17 @@ describe('middleware-user-load', () => {
 
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
       chai.expect(cloudant_find_stub.callCount).to.equal(1);
-      chai.expect(cloudant_insert_stub.callCount).to.equal(1);
-
-      chai.expect(cloudant_insert_stub.getCall(0).args[0].channel_id).to.equal('1234');
-      chai.expect(cloudant_insert_stub.getCall(0).args[0].type).to.equal('user');
 
       chai.expect(result.statusCode).to.equal(200);
       chai.expect(result.payload.input.user).to.equal('1234');
-      chai.expect(result.payload.conversationcontext.user._id).to.equal('1234');
-      chai.expect(result.payload.conversationcontext.user._rev).to.equal('1-1234');
       chai.expect(result.payload.conversationcontext.user.channel_id).to.equal('1234');
     });
   });
 
-  it('enriches the payload with the user data, if a new user is detected, and calls a newuser middleware for the channel before the user is created in the database', () => {
+  it('enriches the payload with the user data, if a new user is detected, and calls a newuser middleware for the channel', () => {
     const cloudant_find_stub = sinon.stub()
       .returns(Promise.resolve({
         docs: []
-      }));
-
-    const cloudant_insert_stub = sinon.stub()
-      .returns(Promise.resolve({
-        id: '1234',
-        rev: '1-1234'
       }));
 
     const ow_stub = sinon.stub()
@@ -140,8 +120,7 @@ describe('middleware-user-load', () => {
     requireMock('cloudant', () => ({
       db: {
         use: () => ({
-          find: cloudant_find_stub,
-          insert: cloudant_insert_stub
+          find: cloudant_find_stub
         })
       }
     }));
@@ -174,10 +153,6 @@ describe('middleware-user-load', () => {
 
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
       chai.expect(cloudant_find_stub.callCount).to.equal(1);
-      chai.expect(cloudant_insert_stub.callCount).to.equal(1);
-
-      chai.expect(cloudant_insert_stub.getCall(0).args[0].channel_id).to.equal('1234');
-      chai.expect(cloudant_insert_stub.getCall(0).args[0].type).to.equal('user');
 
       chai.expect(ow_stub.getCall(0).args[0].name).to.equal('package/channel-newuser');
       chai.expect(ow_stub.getCall(0).args[0].blocking).to.be.true;
@@ -187,8 +162,6 @@ describe('middleware-user-load', () => {
 
       chai.expect(result.statusCode).to.equal(200);
       chai.expect(result.payload.input.user).to.equal('1234');
-      chai.expect(result.payload.conversationcontext.user._id).to.equal('1234');
-      chai.expect(result.payload.conversationcontext.user._rev).to.equal('1-1234');
       chai.expect(result.payload.conversationcontext.user.channel_id).to.equal('1234');
       chai.expect(result.payload.conversationcontext.user.firstname).to.equal('Egon');
       chai.expect(result.payload.conversationcontext.user.lastname).to.equal('Olsen');
@@ -199,12 +172,6 @@ describe('middleware-user-load', () => {
     const cloudant_find_stub = sinon.stub()
       .returns(Promise.resolve({
         docs: []
-      }));
-
-    const cloudant_insert_stub = sinon.stub()
-      .returns(Promise.resolve({
-        id: '1234',
-        rev: '1-1234'
       }));
 
     const ow_stub = sinon.stub()
@@ -229,8 +196,7 @@ describe('middleware-user-load', () => {
     requireMock('cloudant', () => ({
       db: {
         use: () => ({
-          find: cloudant_find_stub,
-          insert: cloudant_insert_stub
+          find: cloudant_find_stub
         })
       }
     }));
@@ -266,10 +232,6 @@ describe('middleware-user-load', () => {
 
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
       chai.expect(cloudant_find_stub.callCount).to.equal(1);
-      chai.expect(cloudant_insert_stub.callCount).to.equal(1);
-
-      chai.expect(cloudant_insert_stub.getCall(0).args[0].channel_id).to.equal('1234');
-      chai.expect(cloudant_insert_stub.getCall(0).args[0].type).to.equal('user');
 
       chai.expect(ow_stub.getCall(0).args[0].name).to.equal('package/channel-newuser');
       chai.expect(ow_stub.getCall(0).args[0].blocking).to.be.true;
@@ -280,8 +242,6 @@ describe('middleware-user-load', () => {
 
       chai.expect(result.statusCode).to.equal(200);
       chai.expect(result.payload.input.user).to.equal('1234');
-      chai.expect(result.payload.conversationcontext.user._id).to.equal('1234');
-      chai.expect(result.payload.conversationcontext.user._rev).to.equal('1-1234');
       chai.expect(result.payload.conversationcontext.user.channel_id).to.equal('1234');
       chai.expect(result.payload.conversationcontext.user.firstname).to.equal('Egon');
       chai.expect(result.payload.conversationcontext.user.lastname).to.equal('Olsen');
@@ -379,12 +339,6 @@ describe('middleware-user-load', () => {
         docs: []
       }));
 
-    const cloudant_insert_stub = sinon.stub()
-      .returns(Promise.resolve({
-        id: '1234',
-        rev: '1-1234'
-      }));
-
     const ow_stub = sinon.stub()
       .returns(Promise.reject({
         statusCode: 500,
@@ -396,8 +350,7 @@ describe('middleware-user-load', () => {
     requireMock('cloudant', () => ({
       db: {
         use: () => ({
-          find: cloudant_find_stub,
-          insert: cloudant_insert_stub
+          find: cloudant_find_stub
         })
       }
     }));
@@ -436,7 +389,6 @@ describe('middleware-user-load', () => {
     })
     .catch(result => {
       chai.expect(cloudant_find_stub.callCount).to.equal(1);
-      chai.expect(cloudant_insert_stub.callCount).to.equal(0);
       chai.expect(ow_stub.callCount).to.equal(1);
 
       chai.expect(ow_stub.getCall(0).args[0].name).to.equal('package/channel-newuser');
@@ -457,20 +409,13 @@ describe('middleware-user-load', () => {
         docs: []
       }));
 
-    const cloudant_insert_stub = sinon.stub()
-      .returns(Promise.resolve({
-        id: '1234',
-        rev: '1-1234'
-      }));
-
     const ow_stub = sinon.stub()
       .throws();
 
     requireMock('cloudant', () => ({
       db: {
         use: () => ({
-          find: cloudant_find_stub,
-          insert: cloudant_insert_stub
+          find: cloudant_find_stub
         })
       }
     }));
@@ -509,7 +454,6 @@ describe('middleware-user-load', () => {
     })
     .catch(result => {
       chai.expect(cloudant_find_stub.callCount).to.equal(1);
-      chai.expect(cloudant_insert_stub.callCount).to.equal(0);
       chai.expect(ow_stub.callCount).to.equal(1);
 
       chai.expect(ow_stub.getCall(0).args[0].name).to.equal('package/channel-newuser');

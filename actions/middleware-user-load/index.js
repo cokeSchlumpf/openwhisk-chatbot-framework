@@ -82,27 +82,7 @@ const user$new = (params) => {
     promise = Promise.resolve(params);
   }
 
-  return promise.then(params => {
-    return db
-      .insert(params.payload.conversationcontext.user)
-      .then(result => {
-        _.set(params, 'payload.conversationcontext.user._id', result.id);
-        _.set(params, 'payload.conversationcontext.user._rev', result.rev);
-        return Promise.resolve(params);
-      })
-      .catch((error = {}) => {
-        return Promise.reject({
-          statusCode: 503,
-          error: {
-            message: 'error inserting the user in the database',
-            parameters: {
-              cause: error,
-              user: params.payload.conversationcontext.user
-            }
-          }
-        });
-      });
-  });
+  return promise;
 }
 
 const user$load = (params) => {
