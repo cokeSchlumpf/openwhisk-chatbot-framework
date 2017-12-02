@@ -54,7 +54,8 @@ const middleware$callasync = (middleware = {}) => (params = {}) => {
             cause: error,
             middleware: middleware
           }
-        }
+        },
+        params: params
       };
 
       params.context.processed.push({
@@ -107,7 +108,8 @@ const middleware$callsync = (middleware = {}) => (params = {}) => {
             cause: error,
             middleware: middleware
           }
-        }
+        },
+        params: params
       };
 
       params.context.processed.push({
@@ -117,6 +119,10 @@ const middleware$callsync = (middleware = {}) => (params = {}) => {
         skipped: false,
         statusCode: error.statusCode || 503
       });
+
+      if (error.payload) {
+        _.set(params, 'payload', _.get(error, 'payload', {}));
+      }
 
       return Promise.reject(middleware_error);
     });
@@ -175,12 +181,12 @@ const middleware$process$recursive = (params, middleware_index = 0, accumulator 
           case 'SUCCESS':
           case 'FAILED_CONTINUE':
             if (continue_on_error) {
-              return Promise.resolve(middleware$process$recursive(params, middleware_index + 1, 'FAILED_CONTINUE'));
+              return Promise.resolve(middleware$process$recursive(error.params || params, middleware_index + 1, 'FAILED_CONTINUE'));
             } else {
-              return Promise.resolve(middleware$process$recursive(params, middleware_index + 1, 'FAILED'));
+              return Promise.resolve(middleware$process$recursive(error.params || params, middleware_index + 1, 'FAILED'));
             }
           case 'FAILED':
-            return Promise.resolve(middleware$process$recursive(params, middleware_index + 1, accumulator));
+            return Promise.resolve(middleware$process$recursive(error.params || params, middleware_index + 1, accumulator));
         }
       });
   }
