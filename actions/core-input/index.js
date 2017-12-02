@@ -225,7 +225,8 @@ const input$create_payload = () => (params) => {
         channel: _.get(params, 'context.connector.channel'),
         user: input.user,
         message: input.message,
-        received: [ now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds() ]
+        received: [ now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds() ],
+        received_timestamp: now.getTime()
       }
     }
 
