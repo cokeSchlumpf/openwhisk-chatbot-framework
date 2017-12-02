@@ -216,6 +216,7 @@ const input$create_list = () => (params) => {
 const input$create_payload = () => (params) => {
   const inputs = _.get(params, 'context.connector.result.input', []);
   const payloads = [];
+  const now = new Date();
 
   _.each(inputs, input => {
     const payload = {
@@ -224,7 +225,7 @@ const input$create_payload = () => (params) => {
         channel: _.get(params, 'context.connector.channel'),
         user: input.user,
         message: input.message,
-        received: Date.now()
+        received: [ now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds() ]
       }
     }
 
