@@ -230,4 +230,53 @@ describe('middleware-output-transform-signals', () => {
       chai.expect(result.payload.context.output.messages).to.equal('Hello World!');
     });
   });
+
+  it('randomly selects messages if `text` is an array.', () => {
+    const config = {
+      messages: [
+        {
+          '$intent': 'hello',
+          value: [
+            {
+              '$intent': 'hello',
+              '$signal2': 'foo',
+              value: {
+                text: [
+                  'a',
+                  'b',
+                  'c'
+                ]
+              }
+            },
+            {
+              '$intent': 'blabla',
+              value: {
+                text: 'Not such a good ranking'
+              }
+            }
+          ]
+        },
+        {
+          '$intent': 'foo',
+          value: {
+            text: 'Fooo Baar'
+          }
+        }
+      ]
+    };
+
+    const payload = {
+      context: {
+        output: {
+          channel: 'facebook',
+          messages: '$intent:hello'
+        }
+      }
+    }
+
+    return require('./index').main({ payload, config }).then(result => {
+      chai.expect(result.statusCode).to.equal(200);
+      chai.expect(result.payload.context.output.messages).to.be.oneOf(['a', 'b', 'c']);
+    });
+  });
 });
