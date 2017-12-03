@@ -1,0 +1,20 @@
+{
+  "name": "middleware-output-transform-simple",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
+  "description": "This middleware transforms sequences and array which include random variations.",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODEENV=test mocha *.test.js"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0",
+    "mock-require": "^2.0.2",
+    "sinon": "^3.2.1"
+  }
+}
