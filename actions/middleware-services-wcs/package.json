@@ -1,15 +1,19 @@
 {
-  "name": "middleware-test",
+  "name": "middleware-wcs",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
-  "description": "A test middleware action.",
+  "description": "A middleware to call IBM Watson Conversation Service.",
   "main": "index.js",
   "scripts": {
     "test": "mocha *.test.js"
   },
   "dependencies": {
-    "serverless-botpack-lib": "^1.0.19"
+    "bluebird": "^3.5.0",
+    "dateformat": "^3.0.2",
+    "lodash": "^4.17.4",
+    "sinon": "^4.1.2",
+    "watson-developer-cloud": "^2.39.0"
   },
   "devDependencies": {
     "chai": "^4.1.1",

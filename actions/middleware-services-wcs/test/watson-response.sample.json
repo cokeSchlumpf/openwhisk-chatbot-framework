@@ -1,0 +1,40 @@
+{
+  "intents": [
+    {
+      "intent": "hello",
+      "confidence": 0.8742280006408691
+    }
+  ],
+  "entities": [],
+  "input": {
+    "text": "Hello"
+  },
+  "output": {
+    "text": [
+      "Hi! What can I do for you?"
+    ],
+    "nodes_visited": [
+      "node_2_1501875253968"
+    ],
+    "log_messages": []
+  },
+  "context": {
+    "conversation_id": "59aebcf9-3df2-4f85-8632-cf8e4c760260",
+    "system": {
+      "dialog_stack": [
+        {
+          "dialog_node": "root"
+        }
+      ],
+      "dialog_turn_counter": 1,
+      "dialog_request_counter": 1,
+      "_node_output_map": {
+        "node_2_1501875253968": [
+          0
+        ]
+      },
+      "branch_exited": true,
+      "branch_exited_reason": "completed"
+    }
+  }
+}

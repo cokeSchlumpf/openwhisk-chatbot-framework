@@ -4,10 +4,15 @@
       "database": "owsk-bot",
       "url": "https://b33e09bd-c08b-4b6f-a6f3-79f121d38be2-bluemix:${CLOUDANT_PASSWORD}@b33e09bd-c08b-4b6f-a6f3-79f121d38be2-bluemix.cloudant.com"
     },
-    "conversation": {
-      "username": "${CONVERSATION_USERNAME}",
-      "password": "${CONVERSATION_PASSWORD}",
-      "workspace": "${CONVERSATION_WORKSPACEID}"
+    "services": {
+      "wcs": {
+        "username": "${CONVERSATION_USERNAME}",
+        "password": "${CONVERSATION_PASSWORD}",
+        "workspace": "${CONVERSATION_WORKSPACEID}"
+      },
+      "wcs_instance": {
+        "workspace": "${CONVERSATION_WORKSPACEID}"
+      }
     },
     "connectors": {
       "input": [
