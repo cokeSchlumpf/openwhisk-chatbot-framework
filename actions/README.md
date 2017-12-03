@@ -26,5 +26,6 @@
 | [x] | middleware-output-transform-simple    | Yes      | This middleware transforms sequences and array which include random variations. |
 | [x] | middleware-output-transform-templates | Yes      | This middleware renders mustache templates for output messages. |
 | [x] | middleware-payload-persist            | Yes      | This middleware persists the current payload in the database. |
+| [x] | middleware-services-wcs               | Yes      | A middleware to call IBM Watson Conversation Service. |
 | [x] | middleware-user-load                  | Yes      | This action loads or initiates the user into the payload. |
 | [x] | middleware-user-persist               | Yes      | This action persists the user from payload.conversationcontext to the database. |
