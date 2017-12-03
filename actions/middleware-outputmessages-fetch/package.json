@@ -1,16 +1,15 @@
 {
-  "name": "middleware-output-send",
+  "name": "middleware-outputmessages-fetch",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
-  "description": "A middleware to send messages from defined in the context.",
+  "description": "This middleware fetches output-messages into transient_context from an action defined in the configuration. These messages can be used by middleare-output-transform-* actions.",
   "main": "index.js",
   "scripts": {
     "test": "NODEENV=test mocha *.test.js"
   },
   "dependencies": {
     "lodash": "^4.17.4",
-    "ms": "^2.1.1",
     "openwhisk": "^3.7.0"
   },
   "devDependencies": {

@@ -1,19 +1,16 @@
 {
-  "name": "core-output",
+  "name": "middleware-output-transform-signals",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",
-  "description": "An OpenWhisk action that transforms the bot intent, calls the output connector and persists context.",
+  "description": "This middleware transforms signals into messages within payload context.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha *.test.js"
+    "test": "NODEENV=test mocha *.test.js"
   },
   "dependencies": {
     "lodash": "^4.17.4",
-    "ms": "^2.0.0",
-    "openwhisk": "^3.7.0",
-    "serverless-botpack-lib": "^1.0.19",
-    "uuid": "^3.1.0"
+    "openwhisk": "^3.7.0"
   },
   "devDependencies": {
     "chai": "^4.1.1",
