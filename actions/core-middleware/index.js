@@ -142,7 +142,7 @@ const middleware$process = (params) => {
 }
 
 const middleware$process$recursive = (params, middleware_index = 0, accumulator = 'SUCCESS') => {
-  const middlewares = _.get(params, 'config.middleware', []);
+  const middlewares = _.get(params, 'middleware', _.get(params, 'config.middleware', []));
 
   if (middleware_index >= _.size(middlewares)) {
     return Promise.resolve(params);

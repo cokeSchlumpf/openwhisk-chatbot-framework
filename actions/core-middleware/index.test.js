@@ -294,4 +294,50 @@ describe('core-middleware', () => {
         chai.expect(result.payload.result).to.equal(4);
       });
   });
+
+  it('middleware can also be passed via parameter', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 2 } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      middleware: [
+        {
+          action: 'package/action_10'
+        },
+        {
+          action: 'package/action_11'
+        },
+      ]
+    }
+
+    const middleware = [
+      {
+        action: 'package/action_00'
+      },
+      {
+        action: 'package/action_01'
+      },
+    ]
+
+    const payload = { result: 0 }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, middleware, payload })
+      .then(result => {        
+        chai.expect(invokeStub.callCount).to.equal(2);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_01');
+
+        chai.expect(result.payload.result).to.equal(2);
+      });
+  });
 });
