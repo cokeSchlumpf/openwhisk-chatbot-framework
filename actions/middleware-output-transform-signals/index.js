@@ -6,13 +6,11 @@ const error = (params) => (error = {}) => {
     console.error(error);
   }
 
-  return context$append(params).then(params => {
-    _.set(error, 'statusCode', _.get(error, 'statusCode', 500));
-    _.set(error, 'error.message', _.get(error, 'error.message', 'internal error during action execution'));
-    _.set(error, 'error.parameters.input', params);
+  _.set(error, 'statusCode', _.get(error, 'statusCode', 500));
+  _.set(error, 'error.message', _.get(error, 'error.message', 'internal error during action execution'));
+  _.set(error, 'error.parameters.input', params);
 
-    return Promise.reject(error);
-  });
+  return Promise.reject(error);
 }
 
 const finalize = ({ payload }) => {
@@ -22,49 +20,143 @@ const finalize = ({ payload }) => {
   });
 }
 
-const validate = (params) => {
-  const channel = params$channel(params);
-  const messages = params$messages(params);
+const params$channel = (params) => {
+  return _.get(params, 'payload.context.output.channel', _.get(params, 'payload.input.channel'));
+}
 
-  if (_.isUndefined(channel)) {
-    return Promise.reject({
+const params$locale = (params) => {
+  return _.get(params, 'payload.context.output.locale', _.get(params, 'payload.input.locale', _.get(params, 'payload.conversationcontext.user.locale', 'NONE')));
+}
+
+const params$messages = (params) => {
+  return _.get(params, 'payload.context.output.messages');
+}
+
+const params$messagetemplates = (params) => {
+  return _.get(params, 'payload.transient_context.output.transform.messages', _.get(params, 'config.messages', 'NONE'));
+}
+
+const transform$replace_templates = (params) => {
+  const channel = params$channel(params);
+  const locale = params$locale(params);
+  const messages = _.isArray(params$messages(params)) ? params$messages(params) : [params$messages(params)];
+  const messagetemplates = params$messagetemplates(params);
+
+  const messages_transformed = _.map(messages, (message) => {
+    if (_.isString(message) && _.startsWith(_.trim(message), '$')) {
+      return transform$replace_template(messagetemplates, message, channel, locale);
+    } else {
+      return message;
+    }
+  });
+
+  if (!_.isArray(params$messages(params)) && _.size(messages_transformed) === 1) {
+    _.set(params, 'payload.context.output.messages', messages_transformed[0]);
+  } else {
+    _.set(params, 'payload.context.output.messages', messages_transformed);
+  }
+
+  return Promise.resolve(params);
+}
+
+const transform$replace_template = (messagetemplates, message, channel, locale) => {
+  const signals = _
+    .chain(message)
+    .split(' ')
+    .map(signal => _.split(signal, ':'))
+    .filter(signal => _.size(signal) > 1)
+    .map(signal => [_.first(signal), _.join(_.tail(signal), ':')])
+    .fromPairs()
+    .value();
+
+  if (_.size(signals) === 0) {
+    return message;
+  }
+
+  const ranking = _
+    .chain(messagetemplates)
+    .filter(template => _
+      .chain(signals)
+      .find((value, signal) => template[signal] && template[signal] != value)
+      .isUndefined()
+      .value())
+    .map(template => {
+      const count = _.reduce(signals, (count, value, signal) => {
+        return _.isUndefined(template[signal]) ? count : count + 1;
+      }, 0);
+
+      return {
+        count,
+        template
+      }
+    })
+    .sortBy(['count'])
+    .reverse()
+    .value();
+
+  if (_.size(ranking) === 0 || ranking[0].count === 0) {
+    return message;
+  }
+
+  const template = _
+    .chain(ranking)
+    .takeWhile({ count: ranking[0].count })
+    .sample()
+    .value()
+    .template;
+
+  if (_.isArray(template.value)) {
+    return transform$replace_template(template.value, message, channel, locale);
+  } else if (_.isObject(template.value)) {
+    return _.get(template.value, `${locale}.${channel}.text`) ||
+    _.get(template.value, `${channel}.${locale}.text`) ||
+    _.get(template.value, `${channel}.text`) ||
+    _.get(template.value, `${locale}.text`) ||
+    _.get(template.value, `text`);
+  } else {
+    console.warn({
       statusCode: 404,
       error: {
-        message: 'The required parameter `channel` is not defined. Define the output channel in `payload.context.output.channel` or `payload.input.channel`.'
+        message: 'The message template is invalid and has no valid `value` field (array or object).',
+        parameters: {
+          template
+        }
       }
     });
+
+    return message;
   }
+}
+
+const validate = (params) => {
+  const channel = params$channel(params);
+  const locale = params$locale(params);
+  const messages = params$messages(params);
+  const messagetemplates = params$messagetemplates(params);
 
   if (_.isUndefined(messages)) {
     return Promise.reject({
       statusCode: 404,
       error: {
-        message: 'The required parameter `payload.context.output.messages` is not defined. Set the messages which should be sent.',
+        message: 'The required parameter `payload.context.output.messages` is not defined. Set the messages which should be transformed.',
       }
     });
   }
 
-  if (_.isUndefined(params$user_channel_id(params, channel))) {
+  if (_.isUndefined(messagetemplates)) {
     return Promise.reject({
       statusCode: 404,
       error: {
-        message: `No channel specific user id found. The channel user id can be defined in \`payload.conversationcontext.user.${channel}_id\` or \`payload.input.user\`.`,
-        parameters: {
-          input: _.get(params, 'payload.input'),
-          user: _.get(params, 'payload.conversationcontext.user')
-        }
+        message: 'No message teamplates found in `payload.transient_context.output.transform.messages` or `config.messages`.'
       }
     });
   }
 
-  if (_.isUndefined(params$connector(params, channel))) {
+  if (!_.isArray(messagetemplates)) {
     return Promise.reject({
       statusCode: 404,
       error: {
-        message: `The configurtion does not include an output connector for channel '${channel}'.`,
-        parameters: {
-          channel: channel
-        }
+        message: 'Message templates must be an array for transform-signals. Please change templates or use another output-transform middleware.'
       }
     });
   }
@@ -75,7 +167,7 @@ const validate = (params) => {
 exports.main = (params) => {
   return Promise.resolve(params)
     .then(validate)
-    .then()
+    .then(transform$replace_templates)
     .then(finalize)
     .catch(error(params));
 }
