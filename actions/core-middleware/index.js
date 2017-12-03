@@ -15,7 +15,7 @@ const error = (params) => (error = {}) => {
 
 const finalize = ({ payload, context }) => {
   return Promise.resolve({
-    statusCode: 200,
+    statusCode: context.statusCode,
     payload: payload,
     processed: context.processed
   });
@@ -54,8 +54,7 @@ const middleware$callasync = (middleware = {}) => (params = {}) => {
             cause: error,
             middleware: middleware
           }
-        },
-        params: params
+        }
       };
 
       params.context.processed.push({
@@ -108,8 +107,7 @@ const middleware$callsync = (middleware = {}) => (params = {}) => {
             cause: error,
             middleware: middleware
           }
-        },
-        params: params
+        }
       };
 
       params.context.processed.push({
@@ -137,6 +135,7 @@ const middleware$call = (params = {}, middleware = {}) => {
 
 const middleware$process = (params) => {
   _.set(params, 'context.processed', []);
+  _.set(params, 'context.statusCode', 200);
 
   return middleware$process$recursive(params);
 }
@@ -176,17 +175,21 @@ const middleware$process$recursive = (params, middleware_index = 0, accumulator 
       .then(params => {
         return middleware$process$recursive(params, middleware_index + 1, accumulator);
       })
-      .catch(error => {        
+      .catch(error => {     
+        const next_params = error.params || params;
+
+        _.set(next_params, 'context.statusCode', 202);
+
         switch (accumulator) {
           case 'SUCCESS':
           case 'FAILED_CONTINUE':
             if (continue_on_error) {
-              return Promise.resolve(middleware$process$recursive(error.params || params, middleware_index + 1, 'FAILED_CONTINUE'));
+              return Promise.resolve(middleware$process$recursive(next_params, middleware_index + 1, 'FAILED_CONTINUE'));
             } else {
-              return Promise.resolve(middleware$process$recursive(error.params || params, middleware_index + 1, 'FAILED'));
+              return Promise.resolve(middleware$process$recursive(next_params, middleware_index + 1, 'FAILED'));
             }
           case 'FAILED':
-            return Promise.resolve(middleware$process$recursive(error.params || params, middleware_index + 1, accumulator));
+            return Promise.resolve(middleware$process$recursive(next_params, middleware_index + 1, accumulator));
         }
       });
   }

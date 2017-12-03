@@ -37,6 +37,7 @@ describe('core-middleware', () => {
 
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
+        chai.expect(result.statusCode).to.equal(200);
         chai.expect(invokeStub.callCount).to.equal(2);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
@@ -78,6 +79,7 @@ describe('core-middleware', () => {
 
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
+        chai.expect(result.statusCode).to.equal(202);
         chai.expect(invokeStub.callCount).to.equal(2);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
@@ -126,6 +128,7 @@ describe('core-middleware', () => {
 
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
+        chai.expect(result.statusCode).to.equal(202);
         chai.expect(invokeStub.callCount).to.equal(3);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
@@ -176,7 +179,8 @@ describe('core-middleware', () => {
 
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
-        console.log(JSON.stringify(payload, null, 2));
+        chai.expect(result.statusCode).to.equal(202);
+        
         chai.expect(invokeStub.callCount).to.equal(3);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
@@ -224,6 +228,8 @@ describe('core-middleware', () => {
 
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
+        chai.expect(result.statusCode).to.equal(202);
+        
         chai.expect(invokeStub.callCount).to.equal(3);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
@@ -284,6 +290,8 @@ describe('core-middleware', () => {
 
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
+        chai.expect(result.statusCode).to.equal(202);
+        
         chai.expect(invokeStub.callCount).to.equal(3);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
@@ -332,7 +340,8 @@ describe('core-middleware', () => {
     requireMock.reRequire('openwhisk');
 
     return requireMock.reRequire('./index').main({ config, middleware, payload })
-      .then(result => {        
+      .then(result => {       
+        chai.expect(result.statusCode).to.equal(200); 
         chai.expect(invokeStub.callCount).to.equal(2);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
