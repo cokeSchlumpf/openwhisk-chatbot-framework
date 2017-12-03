@@ -176,6 +176,7 @@ describe('core-middleware', () => {
 
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
+        console.log(JSON.stringify(payload, null, 2));
         chai.expect(invokeStub.callCount).to.equal(3);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
