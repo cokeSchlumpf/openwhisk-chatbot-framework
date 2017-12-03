@@ -32,7 +32,7 @@ const payload$persist = (params) => {
   const id = payload._id;
   const rev = payload._rev;
   const conversationcontext_id = _.get(payload, 'conversationcontext._id');
-  const payload_without_conversationcontext = _.assign({}, payload, { conversationcontext: conversationcontext_id });
+  const payload_without_conversationcontext = _.omit(_.assign({}, payload, { conversationcontext: conversationcontext_id }), 'transient_context');
 
   let operation = Promise.resolve();
 
