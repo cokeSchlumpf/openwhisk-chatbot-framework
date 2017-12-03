@@ -8,18 +8,11 @@ const watson_response = JSON.parse(fs.readFileSync('./test/watson-response.sampl
 
 describe('middleware-services-wcs', () => {
   it('calls watson conversation service with the user input', () => {
-    const wcs_stub = sinon.stub()
-      .returns(Promise.resolve(watson_response));
+    const wcs_stub = sinon.stub().callsArgWith(1, undefined, watson_response);
 
-    requireMock('bluebird', {
-      promisifyAll: () => {
-        return {
-          messageAsync: wcs_stub
-        }
-      },
-      resolve: (p) => Promise.resolve(p),
-      reject: (p) => Promise.reject(p)
-    });
+    requireMock('watson-developer-cloud/conversation/v1', sinon.stub().returns({
+      message: wcs_stub
+    }));
 
     const config = {
       services: {
@@ -37,12 +30,11 @@ describe('middleware-services-wcs', () => {
       }
     }
 
-    requireMock.reRequire('bluebird');
+    requireMock.reRequire('watson-developer-cloud/conversation/v1');
 
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
-      chai.expect(result.statusCode).to.equal(200);
-
       chai.expect(wcs_stub.callCount).to.equal(1);
+      chai.expect(result.statusCode).to.equal(200);
       chai.expect(wcs_stub.getCall(0).args[0].input.text).to.equal('Hello World!');
       chai.expect(wcs_stub.getCall(0).args[0].context).to.deep.equal({});
 
@@ -53,18 +45,11 @@ describe('middleware-services-wcs', () => {
   });
 
   it('calls watson conversation service with the user input - a service name can be defined to read/write context.', () => {
-    const wcs_stub = sinon.stub()
-      .returns(Promise.resolve(watson_response));
+    const wcs_stub = sinon.stub().callsArgWith(1, undefined, watson_response);
 
-    requireMock('bluebird', {
-      promisifyAll: () => {
-        return {
-          messageAsync: wcs_stub
-        }
-      },
-      resolve: (p) => Promise.resolve(p),
-      reject: (p) => Promise.reject(p)
-    });
+    requireMock('watson-developer-cloud/conversation/v1', sinon.stub().returns({
+      message: wcs_stub
+    }));
 
     const config = {
       services: {
@@ -82,7 +67,7 @@ describe('middleware-services-wcs', () => {
       }
     }
 
-    requireMock.reRequire('bluebird');
+    requireMock.reRequire('watson-developer-cloud/conversation/v1');
 
     return requireMock.reRequire('./index').main({ payload, config, servicename: 'wcs_test' }).then(result => {
       chai.expect(result.statusCode).to.equal(200);
@@ -98,18 +83,11 @@ describe('middleware-services-wcs', () => {
   });
 
   it('uses an existing context from the payload context.', () => {
-    const wcs_stub = sinon.stub()
-      .returns(Promise.resolve(watson_response));
+    const wcs_stub = sinon.stub().callsArgWith(1, undefined, watson_response);
 
-    requireMock('bluebird', {
-      promisifyAll: () => {
-        return {
-          messageAsync: wcs_stub
-        }
-      },
-      resolve: (p) => Promise.resolve(p),
-      reject: (p) => Promise.reject(p)
-    });
+    requireMock('watson-developer-cloud/conversation/v1', sinon.stub().returns({
+      message: wcs_stub
+    }));
 
     const config = {
       services: {
@@ -134,7 +112,7 @@ describe('middleware-services-wcs', () => {
       }
     }
 
-    requireMock.reRequire('bluebird');
+    requireMock.reRequire('watson-developer-cloud/conversation/v1');
 
     return requireMock.reRequire('./index').main({ payload, config, servicename: 'wcs_test' }).then(result => {
       chai.expect(result.statusCode).to.equal(200);
