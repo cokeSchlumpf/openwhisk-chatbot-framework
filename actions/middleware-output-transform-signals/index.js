@@ -107,19 +107,12 @@ const transform$replace_template = (messagetemplates, message, channel, locale) 
   if (_.isArray(template.value)) {
     return transform$replace_template(template.value, message, channel, locale);
   } else if (_.isObject(template.value)) {
-    const text = _.get(template.value, `${locale}.${channel}.text`) ||
-      _.get(template.value, `${channel}.${locale}.text`) ||
-      _.get(template.value, `${channel}.text`) ||
-      _.get(template.value, `${locale}.text`) ||
-      _.get(template.value, `text`);
-
-    if (_.isString(text)) {
-      return text;
-    } else if (_.isArray(text)) {
-      return _.sample(text);
-    } else {
-      return template.value;
-    }
+    return _.get(template.value, `${locale}.${channel}.output`) ||
+      _.get(template.value, `${channel}.${locale}.output`) ||
+      _.get(template.value, `${channel}.output`) ||
+      _.get(template.value, `${locale}.output`) ||
+      _.get(template.value, `output`) ||
+      template.value;
   } else {
     console.warn({
       statusCode: 404,

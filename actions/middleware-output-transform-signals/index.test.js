@@ -14,13 +14,13 @@ describe('middleware-output-transform-signals', () => {
               '$intent': 'hello',
               '$signal2': 'foo',
               value: {
-                text: 'Hello you!'
+                output: 'Hello you!'
               }
             },
             {
               '$intent': 'blabla',
               value: {
-                text: 'Not such a good ranking'
+                output: 'Not such a good ranking'
               }
             }
           ]
@@ -28,7 +28,7 @@ describe('middleware-output-transform-signals', () => {
         {
           '$intent': 'foo',
           value: {
-            text: 'Fooo Baar'
+            output: 'Fooo Baar'
           }
         }
       ]
@@ -58,13 +58,13 @@ describe('middleware-output-transform-signals', () => {
             {
               '$signal': 'bar',
               value: {
-                text: 'Hello you!'
+                output: 'Hello you!'
               }
             },
             {
               '$signal': 'foo',
               value: {
-                text: 'Not such a good ranking'
+                output: 'Not such a good ranking'
               }
             }
           ]
@@ -72,7 +72,7 @@ describe('middleware-output-transform-signals', () => {
         {
           '$intent': 'foo',
           value: {
-            text: 'Fooo Baar'
+            output: 'Fooo Baar'
           }
         }
       ]
@@ -102,13 +102,13 @@ describe('middleware-output-transform-signals', () => {
             {
               '$signal': 'bar',
               value: {
-                text: 'Hello you!'
+                output: 'Hello you!'
               }
             },
             {
               '$signal': 'foo',
               value: {
-                text: 'Not such a good ranking'
+                output: 'Not such a good ranking'
               }
             }
           ]
@@ -116,7 +116,7 @@ describe('middleware-output-transform-signals', () => {
         {
           '$intent': 'foo',
           value: {
-            text: 'Fooo Baar'
+            output: 'Fooo Baar'
           }
         }
       ]
@@ -146,13 +146,13 @@ describe('middleware-output-transform-signals', () => {
             {
               '$signal': 'bar',
               value: {
-                text: 'Hello you!'
+                output: 'Hello you!'
               }
             },
             {
               '$signal': 'foo',
               value: {
-                text: 'Not such a good ranking'
+                output: 'Not such a good ranking'
               }
             }
           ]
@@ -160,7 +160,7 @@ describe('middleware-output-transform-signals', () => {
         {
           '$intent': 'foo',
           value: {
-            text: 'Fooo Baar'
+            output: 'Fooo Baar'
           }
         }
       ]
@@ -196,13 +196,13 @@ describe('middleware-output-transform-signals', () => {
             {
               '$signal': 'bar',
               value: {
-                text: 'Hello you!'
+                output: 'Hello you!'
               }
             },
             {
               '$signal': 'foo',
               value: {
-                text: 'Not such a good ranking'
+                output: 'Not such a good ranking'
               }
             }
           ]
@@ -210,7 +210,7 @@ describe('middleware-output-transform-signals', () => {
         {
           '$intent': 'foo',
           value: {
-            text: 'Fooo Baar'
+            output: 'Fooo Baar'
           }
         }
       ]
@@ -241,7 +241,7 @@ describe('middleware-output-transform-signals', () => {
               '$intent': 'hello',
               '$signal2': 'foo',
               value: {
-                text: [
+                output: [
                   'a',
                   'b',
                   'c'
@@ -251,7 +251,7 @@ describe('middleware-output-transform-signals', () => {
             {
               '$intent': 'blabla',
               value: {
-                text: 'Not such a good ranking'
+                output: 'Not such a good ranking'
               }
             }
           ]
@@ -259,7 +259,7 @@ describe('middleware-output-transform-signals', () => {
         {
           '$intent': 'foo',
           value: {
-            text: 'Fooo Baar'
+            output: 'Fooo Baar'
           }
         }
       ]
@@ -276,7 +276,7 @@ describe('middleware-output-transform-signals', () => {
 
     return require('./index').main({ payload, config }).then(result => {
       chai.expect(result.statusCode).to.equal(200);
-      chai.expect(result.payload.context.output.messages).to.be.oneOf(['a', 'b', 'c']);
+      chai.expect(result.payload.context.output.messages).to.deep.equal(['a', 'b', 'c']);
     });
   });
 });
