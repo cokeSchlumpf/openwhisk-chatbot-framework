@@ -51,7 +51,7 @@ The `parameters` will be passed to the middleware-action invocation. Properties 
 | Properterty           | Description |
 |-|-|
 | `final`               | The action will be executed, even if a preceeding action was failing. |
-| `continue_on_error`   | If the action fails, the following actions are still executed. |
+| `continue_on_error`   | If the action fails, it continues to execute the sequence. |
 
 ## Output
 

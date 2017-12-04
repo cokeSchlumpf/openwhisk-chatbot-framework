@@ -59,7 +59,11 @@
         "parameters": {}
       },
       {
-        "action": "serverless-botpack/middleware-test",
+        "action": "serverless-botpack/middleware-services-wcs",
+        "parameters": {}
+      },
+      {
+        "action": "serverless-botpack/middleware-output-send",
         "parameters": {}
       }
     ],

@@ -1,16 +1,16 @@
 const _ = require('lodash');
-const botpack = require('serverless-botpack-lib');
 const rp = require('request-promise');
 
 exports.main = (params) => {
-  const bot = botpack(params);
-  const message = _.get(params, 'message', _.get(params, 'payload.output.message'));
+  const access_token = _.get(params, 'config.facebook.access_token');
+  const message = _.get(params, 'message');
+  const user = _.get(params, 'user');
 
   const sendCmd = (cmd) => {
     const options = {
       uri: `https://graph.facebook.com/v2.6/me/messages`,
       qs: {
-        access_token: _.get(params, 'config.facebook.access_token')
+        access_token: access_token
       },
       headers: {
         'User-Agent': 'Request-Promise'
@@ -18,7 +18,7 @@ exports.main = (params) => {
       method: 'POST',
       json: {
         recipient: {
-          id: _.get(params, 'payload.output.user')
+          id: user
         },
         "sender_action": cmd     
       }
@@ -29,8 +29,6 @@ exports.main = (params) => {
         statusCode: 200
       };
     }).catch(error => {
-      bot.log.error("Unable to send action.");
-      bot.log.error(error);
       return {
         statusCode: 400,
         error: {
@@ -49,7 +47,7 @@ exports.main = (params) => {
     const options = {
       uri: `https://graph.facebook.com/v2.6/me/messages`,
       qs: {
-        access_token: _.get(params, 'config.facebook.access_token')
+        access_token: access_token
       },
       headers: {
         'User-Agent': 'Request-Promise'
@@ -57,7 +55,7 @@ exports.main = (params) => {
       method: 'POST',
       json: {
         recipient: {
-          id: _.get(params, 'payload.output.user')
+          id: user
         },
         message: {
           text: msg
@@ -66,13 +64,14 @@ exports.main = (params) => {
     };
 
     return rp(options).then(response => {
-      bot.log.info(`Successfully sent generic message with id ${response.message_id} to recipient ${response.recipient_id}`);
+      console.log(`Successfully sent generic message with id ${response.message_id} to recipient ${response.recipient_id}`);
       return {
         statusCode: 200
       };
     }).catch(error => {
-      bot.log.error("Unable to send message.");
-      bot.log.error(error);
+      console.error("Unable to send message.");
+      console.error(error);
+      
       return {
         statusCode: 400,
         error: {
