@@ -46,7 +46,7 @@ describe('openwhisk-chatbot-framework', () => {
         const calls = ow()._mock.calls();
         chai.expect(_.size(calls)).to.equal(3);
         chai.expect(calls[1].action.name).to.equal('serverless-botpack/channels-facebook-input');
-        chai.expect(calls[2].action.name).to.equal('serverless-botpack/channels-test-input');
+        chai.expect(calls[2].action.name).to.equal('serverless-botpack/channels-simple-input');
       });
   });
 

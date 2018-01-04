@@ -4,7 +4,7 @@ Channels are different methods to interact with your bot. E.g. your bot may have
 
 Each channel may have an `input-` and `output-connector`. Additionally a channel may have a `newuser-connector` which is called if a new user needs to be initialized and the channel is required to fetch more user data.
 
-The Cloud Functions Chatbot Framework already includes connectors for the following channels:
+The framework already includes connectors for the following channels:
 
 * Facebook - **TODO: Add documentation**
 

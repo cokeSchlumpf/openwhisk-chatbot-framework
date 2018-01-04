@@ -5,7 +5,7 @@ const sinon = require('sinon');
 
 const action = require('./index');
 
-describe('channels-test-input', () => {
+describe('channels-simple-input', () => {
   it('is a stupid test', () => {
     action.main({
       payload: {

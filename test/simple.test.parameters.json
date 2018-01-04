@@ -9,6 +9,14 @@
       "password": "${CONVERSATION_PASSWORD}",
       "workspace": "${CONVERSATION_WORKSPACEID}"
     },
+    "services": {
+      "wcs": {
+        "username": "${CONVERSATION_USERNAME}",
+        "password": "${CONVERSATION_PASSWORD}",
+        "workspace": "${CONVERSATION_WORKSPACEID}",
+        "endpoint": "${CONVERSATION_ENDPOINT}"
+      }
+    },
     "connectors": {
       "input": [
         {
@@ -18,7 +26,7 @@
         },
         {
           "channel": "test",
-          "action": "serverless-botpack/channels-test-input",
+          "action": "serverless-botpack/channels-simple-input",
           "parameters": {}
         }
       ],
@@ -37,7 +45,7 @@
         },
         {
           "channel": "test",
-          "action": "serverless-botpack/channels-test-output",
+          "action": "serverless-botpack/channels-simple-output",
           "parameters": {}
         }
       ]

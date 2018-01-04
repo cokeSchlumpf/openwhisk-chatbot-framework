@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration
-PACKAGE=serverless-botpack
+PACKAGE=openwhisk-chatbot-framework
 PACKAGE_GENERIC=${PACKAGE}-generic
 PACKAGE_API=${PACKAGE}-api
 

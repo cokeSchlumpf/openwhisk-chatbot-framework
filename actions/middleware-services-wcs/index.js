@@ -36,6 +36,12 @@ const params$message = (params, servicename) => {
     _.get(params, 'payload.input.message');
 }
 
+const params$wcs$endpoint = (params, servicename) => {
+  return _.get(params, 'endpoint') ||
+    _.get(params, `config.services.${servicename || DEFAULT_SERVICE_NAME}.endpoint`) ||
+    _.get(params, `config.services.${DEFAULT_SERVICE_NAME}.endpoint`)
+}
+
 const params$wcs$password = (params, servicename) => {
   return _.get(params, 'password') ||
     _.get(params, `config.services.${servicename || DEFAULT_SERVICE_NAME}.password`) ||
@@ -106,18 +112,21 @@ const validate = (params) => {
 
 const wcs$call = (params) => {
   const servicename = params$servicename(params);
+  const endpoint = params$wcs$endpoint(params, servicename);
   const username = params$wcs$username(params, servicename);
   const password = params$wcs$password(params, servicename);
   const workspace_id = params$wcs$workspace(params, servicename);
   const message = params$message(params, servicename);
   const context = params$context(params, servicename);
 
-  const conversation = Promise.promisifyAll(new WatsonConversation({
+  const wcs_options = _.assign({
     username,
     password,
     path: { workspace_id },
     version_date: WatsonConversation.VERSION_DATE_2017_04_21
-  }));
+  }, endpoint ? { url: endpoint } : {})
+
+  const conversation = Promise.promisifyAll(new WatsonConversation(wcs_options));
 
   const request = {
     input: {
