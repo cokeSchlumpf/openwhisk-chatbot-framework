@@ -1,0 +1,27 @@
+{
+  "name": "openwhisk-chatbot-framework",
+  "version": "1.0.0",
+  "description": "A framework to assemble and create serverless chatbot applications running on Apache OpenWhisk.",
+  "main": "index.js",
+  "author": "Michael Wellner <info@michaelwellner.de>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework/issues"
+  },
+  "homepage": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework#readme",
+  "scripts": {
+    "deploy": "openwhisk-action-manager -d actions",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cokeSchlumpf/openwhisk-chatbot-framework.git"
+  },
+  "keywords": [
+    "openwhisk",
+    "chatbot"
+  ],
+  "devDependencies": {
+    "openwhisk-action-manager": "0.0.5"
+  }
+}
