@@ -514,4 +514,74 @@ describe('middleware-output-send', () => {
       chai.expect(result.payload.output[0].sent[2].message).to.equal('Message 2');
     });
   }).timeout(5000);
+
+  it('changes the payload if the output connector returns an response object; the current response object is send to the connector', () => {
+    const action_stub = sinon.stub()
+      .returns(Promise.resolve({
+        statusCode: 200,
+        response: {
+          output: 'Huhu!'
+        }
+      }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: action_stub
+      }
+    }));
+
+    const config = {
+      connectors: {
+        output: [
+          {
+            channel: 'facebook',
+            action: 'channels-facebook-output'
+          },
+          {
+            channel: 'foo',
+            action: 'channels-foo-output'
+          }
+        ]
+      }
+    };
+
+    const payload = {
+      input: {
+        channel: 'facebook'
+      },
+      conversationcontext: {
+        user: {
+          id: '12345',
+          facebook_id: 'abcdef'
+        }
+      },
+      context: {
+        output: {
+          messages: [
+            'Hello World!',
+            'HUHUU'
+          ]
+        }
+      }
+    }
+
+    requireMock.reRequire('openwhisk');
+    return requireMock.reRequire('./index').main({ payload, config }).then(result => {
+      chai.expect(action_stub.callCount).to.equal(2);
+      chai.expect(action_stub.getCall(0).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(0).args[0].params.message).to.equal('Hello World!');
+      chai.expect(action_stub.getCall(0).args[0].params.user).to.equal('abcdef');
+      chai.expect(JSON.stringify(action_stub.getCall(0).args[0].params.response)).to.equal('{}');
+      chai.expect(action_stub.getCall(0).args[0].params.payload.input.channel).to.equal('facebook');
+
+      chai.expect(JSON.stringify(action_stub.getCall(1).args[0].params.response)).to.equal(JSON.stringify({ output: 'Huhu!' }));
+
+      chai.expect(result.statusCode).to.equal(200);
+      chai.expect(_.size(result.payload.output)).to.equal(1);
+      chai.expect(result.payload.output[0].channel).to.equal('facebook');
+      chai.expect(_.size(result.payload.output[0].sent)).to.equal(2);
+      chai.expect(result.payload.output[0].sent[0].message).to.equal('Hello World!');
+      chai.expect(result.payload.response.output).to.equal('Huhu!');
+    });
+  });
 });

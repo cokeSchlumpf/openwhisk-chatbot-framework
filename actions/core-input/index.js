@@ -87,9 +87,25 @@ const connectors$call$result$validate = (connector) => (result = {}) => {
         }
       }
     }
+
+    if (_.isArray(result.input) && _.size(result.input) > 1) {
+      for (let i = 0; i < _.size(result.input); i++) {
+        if (result.input[i].sync) {
+          return Promise.reject({
+            statusCode: 503,
+            error: {
+              message: `The input connector '${connector.action}' did not respons with a valid response. It's not allowed to send multiple inputs synchronuous.`,
+              parameters: {
+                connector_response: result
+              }
+            }
+          });
+        }
+      }
+    }
   }
 
-  if ((_.isEqual(result.statusCode, 200) || _.isEqual(result.statusCode, 204))
+  if ((_.isEqual(result.statusCode, 200) || _.isEqual(result.statusCode, 204)) && !_.get(result, 'input.sync') && !_.get(result, 'input[0].sync')
     && !_.isObject(result.response)) {
 
     return Promise.reject({
@@ -103,9 +119,9 @@ const connectors$call$result$validate = (connector) => (result = {}) => {
     });
   }
 
-  if ((_.isEqual(result.statusCode, 200) || _.isEqual(result.statusCode, 204))
+  if ((_.isEqual(result.statusCode, 200) || _.isEqual(result.statusCode, 204)) && !_.get(result, 'input.sync') && !_.get(result, 'input[0].sync')
     && !_.isNumber(result.response.statusCode)) {
-      
+
     return Promise.reject({
       statusCode: 504,
       error: {
@@ -198,11 +214,11 @@ const error = (request, response) => (error = {}) => {
  */
 const input$create_list = () => (params) => {
   const input = _.get(params, 'context.connector.result.input');
-  
+
   if (!_.isArray(input) && !_.isUndefined(input)) {
-    _.set(params, 'context.connector.result.input', [ input ]);
+    _.set(params, 'context.connector.result.input', [input]);
   } else if (_.isUndefined(input)) {
-    _.set(params, 'context.connector.result.input', [ ]);
+    _.set(params, 'context.connector.result.input', []);
   }
 
   return Promise.resolve(params);
@@ -224,9 +240,13 @@ const input$create_payload = () => (params) => {
       input: {
         channel: _.get(params, 'context.connector.channel'),
         user: input.user,
+        sync: input.sync || false,
         message: input.message,
-        received: [ now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds() ],
+        received: [now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds()],
         received_timestamp: now.getTime()
+      },
+      context: {
+        connector: _.get(input, 'context', {})
       }
     }
 
@@ -241,7 +261,7 @@ const input$create_payload = () => (params) => {
 /**
  * Invokes the frameworks middleware-processing pipeline.
  */
-const pipeline$invoke = () => (params) => {
+const pipeline$invoke = (sync = false) => (params) => {
   const ow = openwhisk();
   const ow_package = _.get(params, 'config.openwhisk.package');
   const payloads = _.get(params, 'context.payloads', []);
@@ -249,8 +269,8 @@ const pipeline$invoke = () => (params) => {
   const activations = _.map(payloads, payload => {
     const invokeParams = {
       name: `${ow_package}/core-middleware`,
-      blocking: false,
-      result: false,
+      blocking: sync,
+      result: sync,
       params: { payload }
     }
 
@@ -259,6 +279,7 @@ const pipeline$invoke = () => (params) => {
 
   return Promise.all(activations)
     .then(result => {
+      _.set(params, 'context.result', result);
       return Promise.resolve(params);
     })
     .catch(error => Promise.reject({
@@ -285,13 +306,31 @@ const response$create = (response) => (params) => {
   return Promise.resolve(params);
 }
 
+const response$create$sync = (response) => (params) => {
+  const http_response = _.get(params, 'context.result[0].payload.response', {});
+  response.status(_.get(http_response, 'statusCode', 200)).send(_.get(http_response, 'body', {}));
+  return Promise.resolve(params);
+}
+
 const request$process = (params, request, response) => {
   return Promise.resolve(params)
     .then(connectors$call(request))
     .then(input$create_list())
     .then(input$create_payload())
-    .then(pipeline$invoke())
-    .then(response$create(response))
+    .then(params => {
+      const payloads = _.get(params, 'context.payloads', []);
+
+      if (_.size(payloads) === 1 && payloads[0].input.sync) {        
+        // Synchronuous pipeline
+        return Promise.resolve(params)
+          .then(pipeline$invoke(true))
+          .then(response$create$sync(response))
+      } else {
+        return Promise.resolve(params)
+          .then(pipeline$invoke(false))
+          .then(response$create(response))
+      }
+    })
     .catch(error(request, response));
 }
 
@@ -303,7 +342,7 @@ exports.main = routes(action => {
     request$process(params, request, res);
   });
 }, {
-  ignoreProperties: [
-    'config'
-  ]
-});
+    ignoreProperties: [
+      'config'
+    ]
+  });

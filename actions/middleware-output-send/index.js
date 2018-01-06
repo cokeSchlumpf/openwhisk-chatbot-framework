@@ -2,17 +2,23 @@ const _ = require('lodash');
 const ms = require('ms');
 const openwhisk = require('openwhisk');
 
-const connector$call = (connector, user_channel_id, message) => {
+const connector$call = (params, connector, user_channel_id, message) => {
   const ow = openwhisk();
 
   const invokeParams = {
     name: connector.action,
     blocking: true,
     result: true,
-    params: _.assign({}, { message, user: user_channel_id }, connector.parameters || {})
+    params: _.assign({}, { payload: params.payload, response: _.get(params, 'payload.response', {}), message, user: user_channel_id }, connector.parameters || {})
   }
 
-  return ow.actions.invoke(invokeParams);
+  return ow.actions.invoke(invokeParams).then((result = {}) => {
+    if (_.isObject(result.response)) {
+      _.set(params, 'payload.response', result.response);
+    }
+
+    return result;
+  });
 }
 
 const context$append = (params) => {
@@ -72,15 +78,15 @@ const finalize = ({ payload }) => {
   });
 }
 
-const message$send = (connector, user_channel_id, message) => {
+const message$send = (params, connector, user_channel_id, message) => {
   if (_.isObject(message) && message.wait) {
-    return message$wait(connector, user_channel_id, message);
+    return message$wait(params, connector, user_channel_id, message);
   } else {
-    return connector$call(connector, user_channel_id, message);
+    return connector$call(params, connector, user_channel_id, message);
   }
 }
 
-const message$wait = (connector, user_channel_id, message) => {
+const message$wait = (params, connector, user_channel_id, message) => {
   let time = ms(message.wait);
 
   if (time > ms('10s')) {
@@ -90,7 +96,7 @@ const message$wait = (connector, user_channel_id, message) => {
 
   let action = Promise.resolve();
   if (_.size(_.keys(message)) > 1) {
-    action = connector$call(connector, user_channel_id, _.omit(message, 'wait'));
+    action = connector$call(params, connector, user_channel_id, _.omit(message, 'wait'));
   }
 
   return action.then(() => new Promise(resolve => {
@@ -118,7 +124,7 @@ const messages$send$recursive = (params, connector, user_channel_id, messages = 
     const message = _.first(messages);
     const remaining = _.tail(messages);
 
-    return message$send(connector, user_channel_id, message)
+    return message$send(params, connector, user_channel_id, message)
       .then(result => {
         if (result.statusCode !== 200) return Promise.reject(result);
         return context$sent(params, message);

@@ -5,6 +5,9 @@ exports.main = (params = {}) => {
     return {
       statusCode: 200,
       input: {
+        context: {
+          message_id: 'foo'
+        },
         user: _.get(params, 'request.body.user') || '42',
         message: _.get(params, 'request.body.message')
       },
@@ -17,7 +20,10 @@ exports.main = (params = {}) => {
     };
   } else {
     return {
-      statusCode: 422
+      statusCode: 422,
+      body: {
+        message_id: 'foo'
+      }
     };
   }
 };

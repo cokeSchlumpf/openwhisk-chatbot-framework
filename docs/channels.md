@@ -88,6 +88,25 @@ The result of the action should have the following structure:
 }
 ```
 
+The input object may contain a context element that will be used to initialize the payload's context. `input.context` can be found at `payload.context.connector` when executing the middleware actions.
+
+```json
+{
+  "statusCode": 200,
+  "input": {
+    "context": {
+      "foo": "bar"
+    },
+    "user": "<USER_ID>",
+    "message": "The message which was received."
+  },
+  "response": {
+    "statusCode": 200,
+    "body": { },
+  }
+}
+```
+
 Multiple inputs, are also allowed:
 
 ```json

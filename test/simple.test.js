@@ -108,6 +108,8 @@ describe('openwhisk-chatbot-framework', () => {
         const calls = ow()._mock.calls();
         const last_action = _.last(calls);
 
+        console.log(JSON.stringify(_.map(calls, 'result'), null, 2));
+
         chai.expect(last_action.result.payload.conversationcontext.user.firstname).to.equal('Egon');
         chai.expect(last_action.result.payload.conversationcontext.foo).to.equal('bar');
       });
