@@ -44,7 +44,7 @@
           "parameters": {}
         },
         {
-          "channel": "test",
+          "channel": "http",
           "action": "serverless-botpack/channels-http-output",
           "parameters": {}
         }
@@ -59,12 +59,13 @@
     },
     "middleware": [
       {
-        "action": "serverless-botpack/middleware-user-load",
-        "parameters": {}
+        "action": "serverless-botpack/middleware-static-message",
+        "parameters": {
+          "message": "Hello my friend!"
+        }
       },
       {
-        "action": "serverless-botpack/middleware-context-load",
-        "parameters": {}
+        "action": "serverless-botpack/middleware-output-send"
       }
     ],
     "openwhisk": {

@@ -53,42 +53,6 @@ describe('openwhisk-chatbot-framework', () => {
   it('accepts http requests, selects the according input-connector and responds with the responds of the connector before starting the middleware-process', () => {
     ow()._mock.reset();
 
-    const cloudant_find_stub = sinon.stub()
-      .onCall(0).returns(Promise.resolve({
-        docs: [
-          {
-            _id: '1234',
-            _rev: '1-1234',
-            type: 'user',
-            channel_id: 'foo',
-            firstname: 'Egon',
-            lastname: 'Olsen'
-          }
-        ]
-      }))
-      .onCall(1).returns(Promise.resolve({
-        docs: [
-          {
-            _id: '1234',
-            _rev: '1-1234',
-            type: 'conversationcontext',
-            user: '1234',
-            foo: 'bar'
-          }
-        ]
-      }));
-
-    requireMock('cloudant', () => ({
-      db: {
-        use: () => ({
-          find: cloudant_find_stub,
-        })
-      }
-    }));
-
-    requireMock.reRequire('cloudant');
-    requireMock.reRequire('../actions/middleware-user-load');
-
     return ow().actions.invoke({
       name: 'package/core-input',
       blocking: true,
@@ -103,15 +67,13 @@ describe('openwhisk-chatbot-framework', () => {
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
         chai.expect(result.headers['Content-Type']).to.equal('application/json');
-        chai.expect(result.body.ok).to.be.true;
+        chai.expect(result.body.messages[0]).to.be.equal('Hello my friend!');
 
         const calls = ow()._mock.calls();
         const last_action = _.last(calls);
 
-        console.log(JSON.stringify(_.map(calls, 'result'), null, 2));
-
-        chai.expect(last_action.result.payload.conversationcontext.user.firstname).to.equal('Egon');
-        chai.expect(last_action.result.payload.conversationcontext.foo).to.equal('bar');
+        // console.log(JSON.stringify(_.map(calls, call => ({ action: call.action.name, result: call.result })), null, 2));
+        // console.log(JSON.stringify(last_action, null, 2));
       });
   });
 });

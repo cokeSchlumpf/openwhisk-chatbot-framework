@@ -1,9 +1,15 @@
 const _ = require('lodash');
 
-exports.main = ({ message, user }) => {
-  console.log(message);
-
+exports.main = ({ message, payload = {}, response = {} }) => {
   return Promise.resolve({
-    statusCode: 200
+    statusCode: 200,
+    response: {
+      statusCode: 200,
+      body: {
+        messages: _.concat(_.get(response, 'messages', []), message),
+        // conversationcontext: payload.conversationcontext,
+        // context: payload.context
+      }
+    }
   });
 }

@@ -244,10 +244,11 @@ const input$create_payload = () => (params) => {
         message: input.message,
         received: [now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds()],
         received_timestamp: now.getTime()
-      },
-      context: {
-        connector: _.get(input, 'context', {})
       }
+    }
+
+    if (input.context) {
+      _.set(payload, 'context.connector', input.context);
     }
 
     payloads.push(payload);
@@ -308,6 +309,7 @@ const response$create = (response) => (params) => {
 
 const response$create$sync = (response) => (params) => {
   const http_response = _.get(params, 'context.result[0].payload.response', {});
+
   response.status(_.get(http_response, 'statusCode', 200)).send(_.get(http_response, 'body', {}));
   return Promise.resolve(params);
 }
