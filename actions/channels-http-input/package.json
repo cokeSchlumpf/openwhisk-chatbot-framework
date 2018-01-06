@@ -1,5 +1,5 @@
 {
-  "name": "channels-simple-input",
+  "name": "channels-http-input",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "https://github.com/cokeSchlumpf/openwhisk-chatbot-framework",

@@ -47,14 +47,14 @@ All configuration can be put into the `package.parameters.json` file. The minimu
       "input": [
         {
           "channel": "test",
-          "action": "my-serverless-bot/channels-simple-input",
+          "action": "my-serverless-bot/channels-http-input",
           "parameters": {}
         }
       ],
       "output": [
         {
           "channel": "test",
-          "action": "my-serverless-bot/channels-simple-output",
+          "action": "my-serverless-bot/channels-http-output",
           "parameters": {}
         }
       ]

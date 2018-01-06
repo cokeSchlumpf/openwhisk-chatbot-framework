@@ -23,7 +23,7 @@
         },
         {
           "channel": "test",
-          "action": "serverless-botpack/channels-simple-input",
+          "action": "serverless-botpack/channels-http-input",
           "parameters": {}
         }
       ],
@@ -42,7 +42,7 @@
         },
         {
           "channel": "test",
-          "action": "serverless-botpack/channels-simple-output",
+          "action": "serverless-botpack/channels-http-output",
           "parameters": {}
         }
       ]
