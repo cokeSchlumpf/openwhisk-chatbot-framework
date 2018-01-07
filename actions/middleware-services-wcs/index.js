@@ -119,8 +119,6 @@ const wcs$call = (params) => {
   const message = params$message(params, servicename);
   const context = params$context(params, servicename);
 
-  console.log(JSON.stringify({ servicename, endpoint, username, workspace_id }, null, 2));
-
   const wcs_options = _.assign({
     username,
     password,

@@ -6,9 +6,9 @@ exports.main = ({ message, payload = {}, response = {} }) => {
     response: {
       statusCode: 200,
       body: {
-        messages: _.concat(_.get(response, 'messages', []), message),
-        // conversationcontext: payload.conversationcontext,
-        // context: payload.context
+        messages: _.concat(_.get(response, 'body.messages', []), message),
+        conversationcontext: payload.conversationcontext,
+        context: payload.context
       }
     }
   });
