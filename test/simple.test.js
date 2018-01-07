@@ -21,6 +21,9 @@ const toJSON = (response) => {
   }
 }
 
+// Fake environment for tests
+process.env.__OW_ACTION_NAME = "/ns/serverless-botpack/foo"
+
 requireMock('openwhisk', ow);
 
 describe('openwhisk-chatbot-framework', () => {

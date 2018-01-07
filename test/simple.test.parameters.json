@@ -26,7 +26,7 @@
         },
         {
           "channel": "http",
-          "action": "serverless-botpack/channels-http-input",
+          "action": "channels-http-input",
           "parameters": {}
         }
       ],
@@ -67,9 +67,6 @@
       {
         "action": "serverless-botpack/middleware-output-send"
       }
-    ],
-    "openwhisk": {
-      "package": "serverless-botpack"
-    }
+    ]
   }
 }

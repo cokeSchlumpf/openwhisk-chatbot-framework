@@ -2,6 +2,7 @@ const { fromJS } = require('immutable');
 const _ = require('lodash');
 
 const initialState = {
+  actions: [],
   calls: [],
   wait: Promise.resolve()
 }
@@ -24,7 +25,12 @@ module.exports = (parameters) => {
     const call_index = _.size(state.toJS().calls) - 1;
 
     try {
-      const action = require(`../actions/${name.split('/')[1]}`);
+      const action_name = _
+        .chain(name)
+        .split('/')
+        .nth(-1)
+        .value();
+      const action = require(`../actions/${action_name}`);
       const action_result = Promise.resolve(action.main(_.assign({}, parameters, fromJS(params).toJS()))).then(result => {
         state = state.updateIn(['calls', call_index], call => {
           return call.setIn(['result'], result);

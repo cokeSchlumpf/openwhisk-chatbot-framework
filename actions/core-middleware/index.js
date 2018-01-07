@@ -24,8 +24,19 @@ const finalize = ({ payload, context }) => {
 const middleware$callasync = (middleware = {}) => (params = {}) => {
   const ow = openwhisk();
 
+  let action_name = middleware.action;
+  if (action_name.indexOf("/") < 0) {
+    const ow_package = _
+      .chain(params)
+      .get('config.openwhisk.package', _.get(process, 'env.__OW_ACTION_NAME', '/././.'))
+      .split('/')
+      .nth(-2)
+      .value();
+    action_name = `${ow_package}/${action_name}`
+  }
+
   const invokeParams = {
-    name: middleware.action,
+    name: action_name,
     blocking: false,
     params: _.assign({ payload: params.payload }, _.get(middleware, 'parameters', {}))
   }
@@ -72,8 +83,19 @@ const middleware$callasync = (middleware = {}) => (params = {}) => {
 const middleware$callsync = (middleware = {}) => (params = {}) => {
   const ow = openwhisk();
 
+  let action_name = middleware.action;
+  if (action_name.indexOf("/") < 0) {
+    const ow_package = _
+      .chain(params)
+      .get('config.openwhisk.package', _.get(process, 'env.__OW_ACTION_NAME', '/././.'))
+      .split('/')
+      .nth(-2)
+      .value();
+    action_name = `${ow_package}/${action_name}`
+  }
+
   const invokeParams = {
-    name: middleware.action,
+    name: action_name,
     blocking: true,
     result: true,
     params: _.assign({ payload: params.payload }, _.get(middleware, 'parameters', {}))
@@ -128,7 +150,7 @@ const middleware$callsync = (middleware = {}) => (params = {}) => {
 
 const middleware$call = (params = {}, middleware = {}) => {
   const async = _.get(middleware, 'async', false);
-  
+
   return Promise.resolve(params)
     .then(async ? middleware$callasync(middleware) : middleware$callsync(middleware));
 }
@@ -165,7 +187,7 @@ const middleware$process$recursive = (params, middleware_index = 0, accumulator 
             action: middleware.action,
             skipped: true
           });
-          
+
           promise = Promise.resolve(params);
         }
         break;
@@ -175,7 +197,7 @@ const middleware$process$recursive = (params, middleware_index = 0, accumulator 
       .then(params => {
         return middleware$process$recursive(params, middleware_index + 1, accumulator);
       })
-      .catch(error => {     
+      .catch(error => {
         const next_params = error.params || params;
 
         _.set(next_params, 'context.statusCode', 202);

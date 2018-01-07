@@ -174,8 +174,19 @@ const connectors$call$recursive = (request, connector_index = 0) => (params) => 
     const ow = openwhisk();
     const connector = connectors[connector_index];
 
+    let action_name = connector.action;
+    if (action_name.indexOf("/") < 0) {
+      const ow_package = _
+        .chain(params)
+        .get('config.openwhisk.package', _.get(process, 'env.__OW_ACTION_NAME', '/././.'))
+        .split('/')
+        .nth(-2)
+        .value();
+      action_name = `${ow_package}/${action_name}`
+    }
+
     const invokeParams = {
-      name: connector.action,
+      name: action_name,
       blocking: true,
       result: true,
       params: _.assign({}, { request }, connector.parameters || {})
@@ -264,7 +275,12 @@ const input$create_payload = () => (params) => {
  */
 const pipeline$invoke = (sync = false) => (params) => {
   const ow = openwhisk();
-  const ow_package = _.get(params, 'config.openwhisk.package');
+  const ow_package = _
+    .chain(params)
+    .get('config.openwhisk.package', _.get(process, 'env.__OW_ACTION_NAME', '/././.'))
+    .split('/')
+    .nth(-2)
+    .value();
   const payloads = _.get(params, 'context.payloads', []);
 
   const activations = _.map(payloads, payload => {
@@ -322,7 +338,7 @@ const request$process = (params, request, response) => {
     .then(params => {
       const payloads = _.get(params, 'context.payloads', []);
 
-      if (_.size(payloads) === 1 && payloads[0].input.sync) {        
+      if (_.size(payloads) === 1 && payloads[0].input.sync) {
         // Synchronuous pipeline
         return Promise.resolve(params)
           .then(pipeline$invoke(true))
