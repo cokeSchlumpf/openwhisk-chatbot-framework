@@ -85,7 +85,7 @@ $ curl https://openwhisk.eu-de.bluemix.net/api/v1/web/wsk-chatbot-framework_samp
 
 *Note: The first call might take a few seconds as OpenWhisk needs to prepare everything. On the next call, all the actions will be warmed up and the response will be presented much faster. Try it out.*
 
-## Connect a user interface
+## Connect a User Interface
 
 Before we continue to extend the bot's features we'll connect the bot to a user interface. Our first "Hello World" bot is accessible through a simple REST API, which also can be called from client-side JavaScript. An easy to integrate Client UI can be found in this GitHub repository: [github.com/cokeSchlumpf/web-chatclient](https://github.com/cokeSchlumpf/web-chatclient).
 
