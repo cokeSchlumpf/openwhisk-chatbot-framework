@@ -4,9 +4,20 @@ const openwhisk = require('openwhisk');
 
 const connector$call = (params, connector, user_channel_id, message) => {
   const ow = openwhisk();
+  
+  let action_name = connector.action;
+  if (action_name.indexOf("/") < 0) {
+    const ow_package = _.get(params, 'config.openwhisk.package', _
+      .chain(process)
+      .get('env.__OW_ACTION_NAME', '/././.')
+      .split('/')
+      .nth(-2)
+      .value());
+    action_name = `${ow_package}/${action_name}`
+  }
 
   const invokeParams = {
-    name: connector.action,
+    name: action_name,
     blocking: true,
     result: true,
     params: _.assign({}, { payload: params.payload, response: _.get(params, 'payload.response', {}), message, user: user_channel_id }, connector.parameters || {})
