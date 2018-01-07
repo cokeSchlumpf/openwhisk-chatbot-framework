@@ -259,7 +259,11 @@ const input$create_payload = () => (params) => {
     }
 
     if (input.context) {
-      _.set(payload, 'context.connector', input.context);
+      _.set(payload, 'context', input.context);
+    }
+
+    if (input.conversationcontext) {
+      _.set(payload, 'conversationcontext', input.conversationcontext);
     }
 
     payloads.push(payload);
