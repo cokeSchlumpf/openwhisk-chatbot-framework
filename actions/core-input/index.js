@@ -176,12 +176,12 @@ const connectors$call$recursive = (request, connector_index = 0) => (params) => 
 
     let action_name = connector.action;
     if (action_name.indexOf("/") < 0) {
-      const ow_package = _
-        .chain(params)
-        .get('config.openwhisk.package', _.get(process, 'env.__OW_ACTION_NAME', '/././.'))
+      const ow_package = _.get(params, 'config.openwhisk.package', _
+        .chain(process)
+        .get('env.__OW_ACTION_NAME', '/././.')
         .split('/')
         .nth(-2)
-        .value();
+        .value());
       action_name = `${ow_package}/${action_name}`
     }
 
@@ -275,12 +275,12 @@ const input$create_payload = () => (params) => {
  */
 const pipeline$invoke = (sync = false) => (params) => {
   const ow = openwhisk();
-  const ow_package = _
-    .chain(params)
-    .get('config.openwhisk.package', _.get(process, 'env.__OW_ACTION_NAME', '/././.'))
+  const ow_package = _.get(params, 'config.openwhisk.package', _
+    .chain(process)
+    .get('env.__OW_ACTION_NAME', '/././.')
     .split('/')
     .nth(-2)
-    .value();
+    .value());
   const payloads = _.get(params, 'context.payloads', []);
 
   const activations = _.map(payloads, payload => {

@@ -31,7 +31,32 @@ To build a simple Hello World bot in 3 steps, prepare a `package.parameters.json
       {
         "action": "middleware-output-send"
       }
-    ]
+    ],
+    "openwhisk": {
+      "package": "sample-bot"
+    }
   }
 }
+```
+
+No create a pakcage binding with this JSON file to your OpenWhisk Space:
+
+```bash
+wsk package bind /wsk-chatbot-framework_prod/v1 sample-bot -P package.parameters.json
+```
+
+Create accessable API
+
+```
+wsk package create sample-bot-api
+
+wsk action update sample-bot-api/core-input \
+  --sequence sample-bot/core-input \
+  --web true
+```
+
+Sample CURL call
+
+```bash
+curl https://openwhisk.eu-de.bluemix.net/api/v1/web/wsk-chatbot-framework_sample/sample-bot-api/core-input
 ```
