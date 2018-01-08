@@ -26,11 +26,14 @@ const user$new = (params) => {
   const database = _.get(params, 'config.cloudant.database');
 
   const channel = _.get(params, 'payload.input.channel');
+
   const handlers = _
     .chain(params)
-    .get('config.connectors.newuser', [])
-    .map(handler => [handler.channel, handler])
-    .fromPairs()
+    .get('config.connectors', {})
+    .omitBy((connector = {}) => _.isUndefined(connector.newuser))
+    .mapValues((connector, name) => {
+      return _.assign({}, _.get(connector, 'newuser'), { channel: name })
+    })
     .value();
 
   const cloudantConfig = { url, plugin: 'promises' };

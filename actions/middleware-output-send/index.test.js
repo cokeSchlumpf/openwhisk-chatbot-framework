@@ -18,16 +18,16 @@ describe('middleware-output-send', () => {
 
     const config = {
       connectors: {
-        output: [
-          {
-            channel: 'facebook',
-            action: 'channels-facebook-output'
-          },
-          {
-            channel: 'foo',
-            action: 'channels-foo-output'
+        facebook: {
+          output: {
+            action: 'foo/channels-facebook-output'
           }
-        ]
+        },
+        foo: {
+          output: {
+            action: 'foo/channels-foo-output'
+          }
+        }
       }
     };
 
@@ -49,7 +49,7 @@ describe('middleware-output-send', () => {
     requireMock.reRequire('openwhisk');
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
       chai.expect(action_stub.callCount).to.equal(1);
-      chai.expect(action_stub.getCall(0).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(0).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(0).args[0].params.message).to.equal('Hello World!');
       chai.expect(action_stub.getCall(0).args[0].params.user).to.equal('abcdef');
 
@@ -75,16 +75,16 @@ describe('middleware-output-send', () => {
 
     const config = {
       connectors: {
-        output: [
-          {
-            channel: 'facebook',
-            action: 'channels-facebook-output'
-          },
-          {
-            channel: 'foo',
-            action: 'channels-foo-output'
+        facebook: {
+          output: {
+            action: 'foo/channels-facebook-output'
           }
-        ]
+        },
+        foo: {
+          output: {
+            action: 'foo/channels-foo-output'
+          }
+        }
       }
     };
 
@@ -109,11 +109,11 @@ describe('middleware-output-send', () => {
     requireMock.reRequire('openwhisk');
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
       chai.expect(action_stub.callCount).to.equal(2);
-      chai.expect(action_stub.getCall(0).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(0).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(0).args[0].params.message).to.equal('Message 1');
       chai.expect(action_stub.getCall(0).args[0].params.user).to.equal('abcdef');
 
-      chai.expect(action_stub.getCall(1).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(1).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(1).args[0].params.message).to.equal('Message 2');
       chai.expect(action_stub.getCall(1).args[0].params.user).to.equal('abcdef');
 
@@ -129,12 +129,11 @@ describe('middleware-output-send', () => {
   it('returns an error on missing input', () => {
     const config = {
       connectors: {
-        output: [
-          {
-            channel: 'foo',
-            action: 'channels-foo-output'
+        foo: {
+          output: {
+            action: 'foo/channels-foo-output'
           }
-        ]
+        }
       }
     };
 
@@ -182,16 +181,16 @@ describe('middleware-output-send', () => {
 
     const config = {
       connectors: {
-        output: [
-          {
-            channel: 'facebook',
-            action: 'channels-facebook-output'
-          },
-          {
-            channel: 'foo',
-            action: 'channels-foo-output'
+        facebook: {
+          output: {
+            action: 'foo/channels-facebook-output'
           }
-        ]
+        },
+        foo: {
+          output: {
+            action: 'foo/channels-foo-output'
+          }
+        }
       }
     };
 
@@ -218,13 +217,13 @@ describe('middleware-output-send', () => {
       chai.expect(true).to.be.false;
     }).catch(result => {
       chai.expect(result.statusCode).to.equal(503);
-      
+
       chai.expect(action_stub.callCount).to.equal(2);
-      chai.expect(action_stub.getCall(0).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(0).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(0).args[0].params.message).to.equal('Message 1');
       chai.expect(action_stub.getCall(0).args[0].params.user).to.equal('abcdef');
 
-      chai.expect(action_stub.getCall(1).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(1).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(1).args[0].params.message).to.equal('Message 2');
       chai.expect(action_stub.getCall(1).args[0].params.user).to.equal('abcdef');
 
@@ -248,16 +247,16 @@ describe('middleware-output-send', () => {
 
     const config = {
       connectors: {
-        output: [
-          {
-            channel: 'facebook',
-            action: 'channels-facebook-output'
-          },
-          {
-            channel: 'foo',
-            action: 'channels-foo-output'
+        facebook: {
+          output: {
+            action: 'foo/channels-facebook-output'
           }
-        ]
+        },
+        foo: {
+          output: {
+            action: 'foo/channels-foo-output'
+          }
+        }
       }
     };
 
@@ -287,7 +286,7 @@ describe('middleware-output-send', () => {
     requireMock.reRequire('openwhisk');
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
       chai.expect(action_stub.callCount).to.equal(1);
-      chai.expect(action_stub.getCall(0).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(0).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(0).args[0].params.message).to.equal('Hello World!');
       chai.expect(action_stub.getCall(0).args[0].params.user).to.equal('abcdef');
 
@@ -313,16 +312,16 @@ describe('middleware-output-send', () => {
 
     const config = {
       connectors: {
-        output: [
-          {
-            channel: 'facebook',
-            action: 'channels-facebook-output'
-          },
-          {
-            channel: 'foo',
-            action: 'channels-foo-output'
+        facebook: {
+          output: {
+            action: 'foo/channels-facebook-output'
           }
-        ]
+        },
+        foo: {
+          output: {
+            action: 'foo/channels-foo-output'
+          }
+        }
       }
     };
 
@@ -346,7 +345,7 @@ describe('middleware-output-send', () => {
     requireMock.reRequire('openwhisk');
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
       chai.expect(action_stub.callCount).to.equal(1);
-      chai.expect(action_stub.getCall(0).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(0).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(0).args[0].params.message.typing_on).to.be.true;
       chai.expect(action_stub.getCall(0).args[0].params.user).to.equal('abcdef');
 
@@ -372,16 +371,16 @@ describe('middleware-output-send', () => {
 
     const config = {
       connectors: {
-        output: [
-          {
-            channel: 'facebook',
-            action: 'channels-facebook-output'
-          },
-          {
-            channel: 'foo',
-            action: 'channels-foo-output'
+        facebook: {
+          output: {
+            action: 'foo/channels-facebook-output'
           }
-        ]
+        },
+        foo: {
+          output: {
+            action: 'foo/channels-foo-output'
+          }
+        }
       }
     };
 
@@ -415,11 +414,11 @@ describe('middleware-output-send', () => {
       const operation_time = end - start;
       chai.expect(operation_time > 2000).to.be.true;
       chai.expect(action_stub.callCount).to.equal(2);
-      chai.expect(action_stub.getCall(0).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(0).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(0).args[0].params.message).to.equal('Message 1');
       chai.expect(action_stub.getCall(0).args[0].params.user).to.equal('abcdef');
 
-      chai.expect(action_stub.getCall(1).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(1).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(1).args[0].params.message).to.equal('Message 2')
       chai.expect(action_stub.getCall(1).args[0].params.user).to.equal('abcdef');
 
@@ -447,16 +446,16 @@ describe('middleware-output-send', () => {
 
     const config = {
       connectors: {
-        output: [
-          {
-            channel: 'facebook',
-            action: 'channels-facebook-output'
-          },
-          {
-            channel: 'foo',
-            action: 'channels-foo-output'
+        facebook: {
+          output: {
+            action: 'foo/channels-facebook-output'
           }
-        ]
+        },
+        foo: {
+          output: {
+            action: 'foo/channels-foo-output'
+          }
+        }
       }
     };
 
@@ -491,16 +490,16 @@ describe('middleware-output-send', () => {
       const operation_time = end - start;
       chai.expect(operation_time > 2000).to.be.true;
       chai.expect(action_stub.callCount).to.equal(3);
-      chai.expect(action_stub.getCall(0).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(0).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(0).args[0].params.message).to.equal('Message 1');
       chai.expect(action_stub.getCall(0).args[0].params.user).to.equal('abcdef');
 
-      chai.expect(action_stub.getCall(1).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(1).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(1).args[0].params.message.typing_on).to.be.true;
       chai.expect(action_stub.getCall(1).args[0].params.message.wait).to.be.undefined;
       chai.expect(action_stub.getCall(1).args[0].params.user).to.equal('abcdef');
 
-      chai.expect(action_stub.getCall(2).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(2).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(2).args[0].params.message).to.equal('Message 2')
       chai.expect(action_stub.getCall(2).args[0].params.user).to.equal('abcdef');
 
@@ -532,16 +531,16 @@ describe('middleware-output-send', () => {
 
     const config = {
       connectors: {
-        output: [
-          {
-            channel: 'facebook',
-            action: 'channels-facebook-output'
-          },
-          {
-            channel: 'foo',
-            action: 'channels-foo-output'
+        facebook: {
+          output: {
+            action: 'foo/channels-facebook-output'
           }
-        ]
+        },
+        foo: {
+          output: {
+            action: 'foo/channels-foo-output'
+          }
+        }
       }
     };
 
@@ -568,7 +567,7 @@ describe('middleware-output-send', () => {
     requireMock.reRequire('openwhisk');
     return requireMock.reRequire('./index').main({ payload, config }).then(result => {
       chai.expect(action_stub.callCount).to.equal(2);
-      chai.expect(action_stub.getCall(0).args[0].name).to.equal('channels-facebook-output');
+      chai.expect(action_stub.getCall(0).args[0].name).to.equal('foo/channels-facebook-output');
       chai.expect(action_stub.getCall(0).args[0].params.message).to.equal('Hello World!');
       chai.expect(action_stub.getCall(0).args[0].params.user).to.equal('abcdef');
       chai.expect(JSON.stringify(action_stub.getCall(0).args[0].params.response)).to.equal('{}');

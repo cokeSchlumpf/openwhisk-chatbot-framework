@@ -161,7 +161,15 @@ const connectors$call = (request) => (params) => {
  * @param {*} connector_index 
  */
 const connectors$call$recursive = (request, connector_index = 0) => (params) => {
-  const connectors = _.get(params, 'config.connectors.input', []);
+  const connectors = _
+    .chain(params)
+    .get('config.connectors', {})
+    .omitBy((connector = {}) => _.isUndefined(connector.input))
+    .map((connector, name) => {
+      return _.assign({}, _.get(connector, 'input', {}), { channel: name })
+    })
+    .values()
+    .value();
 
   if (connector_index >= _.size(connectors)) {
     return Promise.reject({

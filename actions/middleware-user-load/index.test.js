@@ -133,12 +133,11 @@ describe('middleware-user-load', () => {
         database: 'db'
       },
       connectors: {
-        newuser: [
-          {
-            channel: 'channel',
+        channel: {
+          newuser: {
             action: 'package/channel-newuser'
           }
-        ]
+        }
       }
     };
 
@@ -209,15 +208,14 @@ describe('middleware-user-load', () => {
         database: 'db'
       },
       connectors: {
-        newuser: [
-          {
-            channel: 'channel',
+        channel: {
+          newuser: {
             action: 'package/channel-newuser',
             parameters: {
               foo: 'bar'
             }
           }
-        ]
+        }
       }
     };
 
@@ -363,15 +361,14 @@ describe('middleware-user-load', () => {
         database: 'db'
       },
       connectors: {
-        newuser: [
-          {
-            channel: 'channel',
+        channel: {
+          newuser: {
             action: 'package/channel-newuser',
             parameters: {
               foo: 'bar'
             }
           }
-        ]
+        }
       }
     };
 
@@ -428,15 +425,14 @@ describe('middleware-user-load', () => {
         database: 'db'
       },
       connectors: {
-        newuser: [
-          {
-            channel: 'channel',
+        channel: {
+          newuser: {
             action: 'package/channel-newuser',
             parameters: {
               foo: 'bar'
             }
           }
-        ]
+        }
       }
     };
 

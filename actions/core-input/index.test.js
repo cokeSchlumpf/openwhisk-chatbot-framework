@@ -54,23 +54,21 @@ describe('core-input', () => {
     // sample configuration used for the test
     const config = {
       connectors: {
-        input: [
-          {
-            channel: 'channel_00_name',
-            action: 'package/action_00',
-            parameters: {}
-          },
-          {
-            channel: 'channel_01_name',
-            action: 'package/action_01',
-            parameters: {}
-          },
-          {
-            channel: 'channel_02_name',
-            action: 'package/action_02',
-            parameters: {}
+        channel_00_name: {
+          input: {
+            action: 'package/action_00'
           }
-        ]
+        },
+        channel_01_name: {
+          input: {
+            action: 'package/action_01'
+          }
+        },
+        channel_02_name: {
+          input: {
+            action: 'package/action_02'
+          }
+        }
       },
       openwhisk: {
         package: 'testpackage'
@@ -80,8 +78,8 @@ describe('core-input', () => {
     return requireMock.reRequire('./index').main({ __ow_method: 'get', __ow_path: '/', config })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
-        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.input[1].action);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.channel_00_name.input.action);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.channel_01_name.input.action);
         chai.expect(invokeStub.getCall(2).args[0].name).to.equal(`${config.openwhisk.package}/core-middleware`);
         chai.expect(invokeStub.getCall(2).args[0].params.payload.id).to.exist;
         chai.expect(invokeStub.getCall(2).args[0].params.payload.input.channel).to.equal('channel_01_name');
@@ -124,23 +122,21 @@ describe('core-input', () => {
     // sample configuration used for the test
     const config = {
       connectors: {
-        input: [
-          {
-            channel: 'channel_00_name',
-            action: 'package/action_00',
-            parameters: {}
-          },
-          {
-            channel: 'channel_01_name',
-            action: 'package/action_01',
-            parameters: {}
-          },
-          {
-            channel: 'channel_02_name',
-            action: 'package/action_02',
-            parameters: {}
+        channel_00_name: {
+          input: {
+            action: 'package/action_00'
           }
-        ]
+        },
+        channel_01_name: {
+          input: {
+            action: 'package/action_01'
+          }
+        },
+        channel_02_name: {
+          input: {
+            action: 'package/action_02'
+          }
+        }
       },
       openwhisk: {
         package: 'testpackage'
@@ -150,8 +146,8 @@ describe('core-input', () => {
     return requireMock.reRequire('./index').main({ __ow_method: 'get', __ow_path: '/', config })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
-        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.input[1].action);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.channel_00_name.input.action);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.channel_01_name.input.action);
         chai.expect(invokeStub.getCall(2).args[0].name).to.equal(`${config.openwhisk.package}/core-middleware`);
         chai.expect(invokeStub.getCall(2).args[0].params.payload.id).to.exist;
         chai.expect(invokeStub.getCall(2).args[0].params.payload.input.channel).to.equal('channel_01_name');
@@ -195,23 +191,21 @@ describe('core-input', () => {
     // sample configuration used for the test
     const config = {
       connectors: {
-        input: [
-          {
-            channel: 'channel_00_name',
-            action: 'package/action_00',
-            parameters: {}
-          },
-          {
-            channel: 'channel_01_name',
-            action: 'package/action_01',
-            parameters: {}
-          },
-          {
-            channel: 'channel_02_name',
-            action: 'package/action_02',
-            parameters: {}
+        channel_00_name: {
+          input: {
+            action: 'package/action_00'
           }
-        ]
+        },
+        channel_01_name: {
+          input: {
+            action: 'package/action_01'
+          }
+        },
+        channel_02_name: {
+          input: {
+            action: 'package/action_02'
+          }
+        }
       },
       openwhisk: {
         package: 'testpackage'
@@ -221,8 +215,8 @@ describe('core-input', () => {
     return requireMock.reRequire('./index').main({ __ow_method: 'get', __ow_path: '/', config })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
-        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.input[1].action);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.channel_00_name.input.action);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.channel_01_name.input.action);
         chai.expect(invokeStub.getCall(2).args[0].name).to.equal(`${config.openwhisk.package}/core-middleware`);
         chai.expect(invokeStub.getCall(2).args[0].params.payload.id).to.exist;
         chai.expect(invokeStub.getCall(2).args[0].params.payload.input.channel).to.equal('channel_01_name');
@@ -254,13 +248,11 @@ describe('core-input', () => {
     // sample configuration used for the test
     const config = {
       connectors: {
-        input: [
-          {
-            channel: 'channel_00_name',
-            action: 'package/action_00',
-            parameters: {}
+        channel_00_name: {
+          input: {
+            action: 'package/action_00'
           }
-        ]
+        }
       },
       openwhisk: {
         package: 'testpackage'
@@ -270,7 +262,7 @@ describe('core-input', () => {
     return requireMock.reRequire('./index').main({ __ow_method: 'get', __ow_path: '/', config })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.channel_00_name.input.action);
         chai.expect(invokeStub.getCall(1).args[0].name).to.equal(`${config.openwhisk.package}/core-middleware`);
       });
   });
@@ -292,20 +284,18 @@ describe('core-input', () => {
     // sample configuration used for the test
     const config = {
       connectors: {
-        input: [
-          {
-            channel: 'channel_00_name',
-            action: 'package/action_00',
-            parameters: {}
+        channel_00_name: {
+          input: {
+            action: 'package/action_00'
           }
-        ]
+        }
       }
     }
 
     return requireMock.reRequire('./index').main({ __ow_method: 'get', __ow_path: '/', config })
       .then(result => {
         chai.expect(result.statusCode).to.equal(404);
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.channel_00_name.input.action);
       });
   });
 
@@ -330,13 +320,11 @@ describe('core-input', () => {
     // sample configuration used for the test
     const config = {
       connectors: {
-        input: [
-          {
-            channel: 'channel_00_name',
-            action: 'package/action_00',
-            parameters: {}
+        channel_00_name: {
+          input: {
+            action: 'package/action_00'
           }
-        ]
+        }
       }
     }
 
@@ -386,23 +374,21 @@ describe('core-input', () => {
     // sample configuration used for the test
     const config = {
       connectors: {
-        input: [
-          {
-            channel: 'channel_00_name',
-            action: 'package/action_00',
-            parameters: {}
-          },
-          {
-            channel: 'channel_01_name',
-            action: 'package/action_01',
-            parameters: {}
-          },
-          {
-            channel: 'channel_02_name',
-            action: 'package/action_02',
-            parameters: {}
+        channel_00_name: {
+          input: {
+            action: 'package/action_00'
           }
-        ]
+        },
+        channel_01_name: {
+          input: {
+            action: 'package/action_01'
+          }
+        },
+        channel_02_name: {
+          input: {
+            action: 'package/action_02'
+          }
+        }
       },
       openwhisk: {
         package: 'testpackage'
@@ -414,8 +400,8 @@ describe('core-input', () => {
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
         chai.expect(result.body.foo).to.equal('bar');
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
-        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.input[1].action);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.channel_00_name.input.action);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.channel_01_name.input.action);
         chai.expect(invokeStub.getCall(2).args[0].name).to.equal(`${config.openwhisk.package}/core-middleware`);
         chai.expect(invokeStub.getCall(2).args[0].params.payload.id).to.exist;
         chai.expect(invokeStub.getCall(2).args[0].params.payload.input.channel).to.equal('channel_01_name');
@@ -458,23 +444,21 @@ describe('core-input', () => {
     // sample configuration used for the test
     const config = {
       connectors: {
-        input: [
-          {
-            channel: 'channel_00_name',
-            action: 'package/action_00',
-            parameters: {}
-          },
-          {
-            channel: 'channel_01_name',
-            action: 'package/action_01',
-            parameters: {}
-          },
-          {
-            channel: 'channel_02_name',
-            action: 'package/action_02',
-            parameters: {}
+        channel_00_name: {
+          input: {
+            action: 'package/action_00'
           }
-        ]
+        },
+        channel_01_name: {
+          input: {
+            action: 'package/action_01'
+          }
+        },
+        channel_02_name: {
+          input: {
+            action: 'package/action_02'
+          }
+        }
       },
       openwhisk: {
         package: 'testpackage'
@@ -484,8 +468,8 @@ describe('core-input', () => {
     return requireMock.reRequire('./index').main({ __ow_method: 'get', __ow_path: '/', config })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.input[0].action);
-        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.input[1].action);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal(config.connectors.channel_00_name.input.action);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal(config.connectors.channel_01_name.input.action);
         chai.expect(invokeStub.getCall(2).args[0].name).to.equal(`${config.openwhisk.package}/core-middleware`);
         chai.expect(invokeStub.getCall(2).args[0].params.payload.id).to.exist;
         chai.expect(invokeStub.getCall(2).args[0].params.payload.input.channel).to.equal('channel_01_name');

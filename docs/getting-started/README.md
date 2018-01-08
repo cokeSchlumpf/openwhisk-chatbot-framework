@@ -16,18 +16,14 @@ Let's start with a quite simple one: The classical "Hello World!" example.
 {
   "config": {
     "connectors": {
-      "input": [
-        {
-          "channel": "http",
+      "http": {
+        "input": {
           "action": "channels-http-input"
-        }
-      ],
-      "output": [
-        {
-          "channel": "http",
+        },
+        "output": {
           "action": "channels-http-output"
         }
-      ]
+      }
     },
     "middleware": [
       { 

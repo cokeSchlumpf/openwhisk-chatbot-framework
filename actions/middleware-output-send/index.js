@@ -162,8 +162,16 @@ const params$channel = (params) => {
 }
 
 const params$connector = (params, channel) => {
-  const connectors = _.groupBy(_.get(params, 'config.connectors.output', []), 'channel');
-  return _.first(connectors[channel] || []);
+  const connectors = _
+    .chain(params)
+    .get('config.connectors', {})
+    .omitBy((connector = {}) => _.isUndefined(connector.output))
+    .mapValues((connector, name) => {
+      return _.assign({}, _.get(connector, 'output', {}), { channel: name })
+    })
+    .value();
+
+  return connectors[channel];
 }
 
 const params$user_channel_id = (params, channel) => {
