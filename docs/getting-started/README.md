@@ -2,7 +2,7 @@
 
 Building simple chatbots is quite easy; building complex chatbots with many integrations, channels and services is harder. But don't be fooled - Getting started with OpenWhisk Chatbot Framework is incredibly simple, even though it enables you to extend your chatbot with many functions easily. 
 
-To get started without struggle, you should bring some basic skills of Apache OpenWhisk with you, as well as an instance of OpenWhisk which you can use. This can be a self hosted or a free available, e.g. [IBM Cloud Functions](https://console.bluemix.net/openwhisk). For the examples will use the [OpenWhisk CLI](https://github.com/apache/incubator-openwhisk-cli). If you haven't installed and if you are using IBM Cloud, you can download it from here: [https://console.bluemix.net/openwhisk/learn/cli](https://console.bluemix.net/openwhisk/learn/cli).
+To get started without struggle, you should bring some basic skills of Apache OpenWhisk with you, as well as an instance of OpenWhisk which you can use. This can be a self hosted or a free available, e.g. [IBM Cloud Functions](https://console.bluemix.net/openwhisk). For the examples we'll use the [OpenWhisk CLI](https://github.com/apache/incubator-openwhisk-cli). If you haven't installed and if you are using IBM Cloud, you can download it from here: [https://console.bluemix.net/openwhisk/learn/cli](https://console.bluemix.net/openwhisk/learn/cli).
 
 The guide will introduce you step by step into the most important components of OpenWhisk Chatbot Framework by building a chatbot; starting simple, becoming more advanced.
 
@@ -103,8 +103,8 @@ Now you can provide the sample UI with an HTTP server, e.g.
 
 ```bash
 # within the repository
-cd build
-python -m SimpleHTTPServer
+$ cd build
+$ python -m SimpleHTTPServer
 ```
 
 This will provide you a sample web page with a chat window on [localhost:8000/index.ocf.html](http://localhost:8000/index.ocf.html).
