@@ -192,7 +192,7 @@ const result$validate = (params) => {
     });
   }
 
-  if (_.isUndefined(payload)) {
+  if (_.isUndefined(payload) && statusCode !== 422) {
     return Promise.reject({
       statusCode: 503,
       error: {
