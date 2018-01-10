@@ -237,15 +237,6 @@ const validate = (params) => {
   const initial_state = params$initial_state(params, patternname);
   const states = params$states(params, patternname);
 
-  if (_.isUndefined(patternname)) {
-    return Promise.reject({
-      statusCode: 503,
-      error: {
-        message: `The configuration parameter 'config.patterns.${patternname}' is not set.`
-      }
-    });
-  }
-
   if (_.isUndefined(initial_state)) {
     return Promise.reject({
       statusCode: 503,
