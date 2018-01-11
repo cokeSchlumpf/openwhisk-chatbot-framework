@@ -149,7 +149,7 @@ const middleware$callsync = (middleware = {}) => (params = {}) => {
 }
 
 const middleware$call = (params = {}, middleware = {}) => {
-  const async = _.get(middleware, 'async', false);
+  const async = _.get(middleware, 'properties.async', false);
 
   return Promise.resolve(params)
     .then(async ? middleware$callasync(middleware) : middleware$callsync(middleware));
