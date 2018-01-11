@@ -171,6 +171,7 @@ const middleware$process$recursive = (params, middleware_index = 0, accumulator 
     const middleware = middlewares[middleware_index];
     const continue_on_error = _.get(middleware, 'properties.continue_on_error', false);
     const final = _.get(middleware, 'properties.final', false);
+    const catch_action = _.get(middleware, 'properties.catch', false);
 
     let promise;
 
@@ -180,7 +181,7 @@ const middleware$process$recursive = (params, middleware_index = 0, accumulator 
         promise = middleware$call(params, middleware);
         break;
       case 'FAILED':
-        if (final) {
+        if (final || catch_action) {
           promise = middleware$call(params, middleware);
         } else {
           params.context.processed.push({
@@ -195,7 +196,7 @@ const middleware$process$recursive = (params, middleware_index = 0, accumulator 
 
     return promise
       .then(params => {
-        return middleware$process$recursive(params, middleware_index + 1, accumulator);
+        return middleware$process$recursive(params, middleware_index + 1, catch_action ? 'FAILED_CONTINUE' : accumulator);
       })
       .catch(error => {
         const next_params = error.params || params;
