@@ -187,9 +187,9 @@ ok: created binding sample-bot
 
 Using the chat client, we can now do a chat with the conversation created within Watson Conversation Service. 
 
-![A simple Chat Window connected to OpenWhisk Chatbot Framework](./chat-window.png)
+![A simple Chat Window connected to OpenWhisk Chatbot Framework](./chat-window-wcs.png)
 
-The OpenWhisk Chatbot Framework and the chat client are already handling the current conversationcontext, the state, of the conversation; thus we've created a fully functional simple chat bot with user interface without any coding yet; And, as we are using OpenWhisk Chatbot Framework, we can easily extend the functionality of the bot, e.g.
+The OpenWhisk Chatbot Framework and the chat client are already handling the conversations context, the state, of the conversation; thus we've created a fully functional simple chat bot with user interface without any coding yet; And, as we are using OpenWhisk Chatbot Framework, we can easily extend the functionality of the bot, e.g.
 
   * Use `middleware-context-load`, `middleware-context-persist` together with `middleware-user-load` and `middleware-user-persist` to add persistence to your bot. With this you would also be able to keep the conversation state over mutliple channels.
 
