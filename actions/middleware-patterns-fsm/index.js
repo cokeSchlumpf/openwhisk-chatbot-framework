@@ -70,6 +70,16 @@ const params$current_data = (params, patternname) => {
 }
 
 /**
+ * The timestamp when the current time was set.
+ * 
+ * @param {*} params 
+ * @param {*} patternname 
+ */
+const params$current_since = (params, patternname) => {
+  return _.get(params, `payload.conversationcontext.patterns.${patternname}.since_timestamp`);
+}
+
+/**
  * The name of the current state.
  * 
  * @param {*} params 
@@ -77,6 +87,36 @@ const params$current_data = (params, patternname) => {
  */
 const params$current_state = (params, patternname) => {
   return _.get(params, `payload.conversationcontext.patterns.${patternname}.state`);
+}
+
+/**
+ * The timeout of the current action.
+ * 
+ * @param {*} params 
+ * @param {*} patternname 
+ */
+const params$current_timeout = (params, patternname) => {
+  return _.get(params, `payload.conversationcontext.patterns.${patternname}.timeout`);
+}
+
+/**
+ * The action which should be called on a timeout.
+ * 
+ * @param {*} params 
+ * @param {*} patternname 
+ */
+const params$current_timeout_goto = (params, patternname) => {
+  return _.get(params, `payload.conversationcontext.patterns.${patternname}.timeout_goto`);
+}
+
+/**
+ * The data which should be called on a timeout.
+ * 
+ * @param {*} params 
+ * @param {*} patternname 
+ */
+const params$current_timeout_using = (params, patternname) => {
+  return _.get(params, `payload.conversationcontext.patterns.${patternname}.timeout_using`);
 }
 
 /**
@@ -141,6 +181,9 @@ const result$handle = (params) => {
 
   const state_goto = _.get(params, 'context.result.fsm.goto', current_state);
   const state_using = _.get(params, 'context.result.fsm.using', current_data);
+  const state_timeout = _.get(params, 'context.result.fsm.timeout');
+  const state_timeout_goto = _.get(params, 'context.result.fsm.timeout_goto');
+  const state_timeout_using = _.get(params, 'context.result.fsm.timeout_using');
 
   if (statusCode === 422 && _.get(params, 'context.unhandled')) { // unsuccessful unhandled action
     return Promise.reject({
@@ -170,10 +213,16 @@ const result$handle = (params) => {
       });
     }
   } else {
+    const now = new Date();
     _.set(params, 'payload', _.get(params, 'context.result.payload', {}));
     _.set(params, `payload.conversationcontext.patterns.${patternname}.state`, state_goto);
+    _.set(params, `payload.conversationcontext.patterns.${patternname}.since_datetime`, [now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds()]);
+    _.set(params, `payload.conversationcontext.patterns.${patternname}.since_timestamp`, now.getTime());
     _.set(params, `payload.conversationcontext.patterns.${patternname}.data`, state_using);
-
+    _.set(params, `payload.conversationcontext.patterns.${patternname}.timeout`, state_timeout);
+    _.set(params, `payload.conversationcontext.patterns.${patternname}.timeout_goto`, state_timeout_goto);
+    _.set(params, `payload.conversationcontext.patterns.${patternname}.timeout_using`, state_timeout_using);
+    
     return Promise.resolve(params);
   }
 }
@@ -207,18 +256,26 @@ const result$validate = (params) => {
 const state$init = (params) => {
   const patternname = params$patternname(params);
   const current_state = params$current_state(params, patternname);
+  const current_since = params$current_since(params, patternname);
+  const current_timeout = params$current_timeout(params, patternname);
+  const now = new Date().getTime();
 
   let state;
 
-  if (current_state) {
-    state = {
-      name: current_state,
-      data: params$current_data(params, patternname)
-    }
-  } else {
+  if (!current_state) {
     state = {
       name: params$initial_state(params, patternname),
       data: params$initial_data(params, patternname)
+    }
+  } else if (current_timeout && now - current_since - current_timeout > 0) {
+    state = {
+      name: params$current_timeout_goto(params, patternname) || params$initial_state(params, patternname),
+      data: params$current_timeout_using(params, patternname) || params$initial_data(params, patternname)
+    }
+  } else {
+    state = {
+      name: current_state,
+      data: params$current_data(params, patternname)
     }
   }
 
