@@ -12,7 +12,7 @@ const action$call = (params) => {
     name: action.action,
     blocking: true,
     result: true,
-    params: _.assign({}, { payload: params.payload }, { fsm_state: state }, action.parameters || {})
+    params: _.assign({}, { payload: params.payload }, { state }, action.parameters || {})
   };
 
   return ow.actions.invoke(invokeParams).then(result => {
@@ -66,7 +66,7 @@ const finalize = ({ payload }) => {
  * @param {*} patternname 
  */
 const params$current_data = (params, patternname) => {
-  return _.get(params, `payload.conversationcontext.patterns.${patternname}.data`);
+  return _.get(params, `fsm.data`, _.get(params, `payload.conversationcontext.patterns.${patternname}.data`));
 }
 
 /**
@@ -76,7 +76,7 @@ const params$current_data = (params, patternname) => {
  * @param {*} patternname 
  */
 const params$current_since = (params, patternname) => {
-  return _.get(params, `payload.conversationcontext.patterns.${patternname}.since_timestamp`);
+  return _.get(params, `fsm.since_timestamp`, _.get(params, `payload.conversationcontext.patterns.${patternname}.since_timestamp`));
 }
 
 /**
@@ -86,7 +86,7 @@ const params$current_since = (params, patternname) => {
  * @param {*} patternname 
  */
 const params$current_state = (params, patternname) => {
-  return _.get(params, `payload.conversationcontext.patterns.${patternname}.state`);
+  return _.get(params, `fsm.state`, _.get(params, `payload.conversationcontext.patterns.${patternname}.state`));
 }
 
 /**
@@ -96,7 +96,7 @@ const params$current_state = (params, patternname) => {
  * @param {*} patternname 
  */
 const params$current_timeout = (params, patternname) => {
-  return _.get(params, `payload.conversationcontext.patterns.${patternname}.timeout`);
+  return _.get(params, `fsm.tiemout`, _.get(params, `payload.conversationcontext.patterns.${patternname}.timeout`));
 }
 
 /**
@@ -106,7 +106,7 @@ const params$current_timeout = (params, patternname) => {
  * @param {*} patternname 
  */
 const params$current_timeout_goto = (params, patternname) => {
-  return _.get(params, `payload.conversationcontext.patterns.${patternname}.timeout_goto`);
+  return _.get(params, `fsm.timeout_goto`, _.get(params, `payload.conversationcontext.patterns.${patternname}.timeout_goto`));
 }
 
 /**
@@ -116,7 +116,7 @@ const params$current_timeout_goto = (params, patternname) => {
  * @param {*} patternname 
  */
 const params$current_timeout_using = (params, patternname) => {
-  return _.get(params, `payload.conversationcontext.patterns.${patternname}.timeout_using`);
+  return _.get(params, `fsm.timeout_using`, _.get(params, `payload.conversationcontext.patterns.${patternname}.timeout_using`));
 }
 
 /**

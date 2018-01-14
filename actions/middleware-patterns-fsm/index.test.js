@@ -131,7 +131,58 @@ describe('middleware-patterns-fsm', () => {
         
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
-        chai.expect(invokeStub.getCall(0).args[0].params.fsm_state.data).to.equal('lala');
+        chai.expect(invokeStub.getCall(0).args[0].params.state.data).to.equal('lala');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+        
+        chai.expect(result.payload.result).to.equal(1);
+        chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
+        chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
+      });
+  });
+
+  it('also accepts the current state directly passed to the action', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: 'foo', using: 'lorem ipsum' } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: 'bar'
+          },
+          states: {
+            foo: { action: 'package/action_00' },
+            bar: { action: 'package/action_01' }
+          }
+        }
+      }
+    }
+
+    const payload = { 
+      conversationcontext: { },
+      result: 0 
+    }
+
+    const fsm = {
+      state: 'foo',
+      data: 'lala'
+    }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload, fsm })
+      .then(result => {
+        chai.expect(result.statusCode).to.equal(200);
+        
+        chai.expect(invokeStub.callCount).to.equal(1);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
+        chai.expect(invokeStub.getCall(0).args[0].params.state.data).to.equal('lala');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
         
         chai.expect(result.payload.result).to.equal(1);
