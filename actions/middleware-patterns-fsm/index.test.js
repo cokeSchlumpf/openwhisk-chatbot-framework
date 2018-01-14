@@ -21,8 +21,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           }
         }
       }
@@ -62,8 +62,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           }
         }
       }
@@ -104,8 +104,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           }
         }
       }
@@ -131,7 +131,7 @@ describe('middleware-patterns-fsm', () => {
         
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
-        chai.expect(invokeStub.getCall(0).args[0].params.state.data).to.equal('lala');
+        chai.expect(invokeStub.getCall(0).args[0].params.fsm.data).to.equal('lala');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
         
         chai.expect(result.payload.result).to.equal(1);
@@ -157,8 +157,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           }
         }
       }
@@ -182,12 +182,12 @@ describe('middleware-patterns-fsm', () => {
         
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
-        chai.expect(invokeStub.getCall(0).args[0].params.state.data).to.equal('lala');
+        chai.expect(invokeStub.getCall(0).args[0].params.fsm.data).to.equal('lala');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
         
         chai.expect(result.payload.result).to.equal(1);
-        chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
-        chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
+        chai.expect(result.fsm.state).to.equal('foo');
+        chai.expect(result.fsm.data).to.equal('lorem ipsum');
       });
   });
 
@@ -209,8 +209,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           },
           unhandled: { action: 'package/action_03' }
         }
@@ -253,8 +253,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           },
           unhandled: { action: 'package/action_03' }
         }
@@ -287,9 +287,11 @@ describe('middleware-patterns-fsm', () => {
       .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { 
         goto: 'foo', 
         using: 'lorem ipsum',
-        timeout: 3 * 60 * 60 * 1000,
-        timeout_goto: 'other_state',
-        timeout_using: 'foo bar'
+        timeout: {
+          ms: 3 * 60 * 60 * 1000,
+          goto: 'other_state',
+          using: 'foo bar'
+        }
       } }));
 
     requireMock('openwhisk', () => ({
@@ -305,8 +307,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           },
           unhandled: { action: 'package/action_03' }
         }
@@ -331,9 +333,9 @@ describe('middleware-patterns-fsm', () => {
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
         chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
 
-        chai.expect(result.payload.conversationcontext.patterns.fsm.timeout).to.equal(3 * 60 * 60 * 1000);
-        chai.expect(result.payload.conversationcontext.patterns.fsm.timeout_goto).to.equal('other_state');
-        chai.expect(result.payload.conversationcontext.patterns.fsm.timeout_using).to.equal('foo bar');
+        chai.expect(result.payload.conversationcontext.patterns.fsm.timeout.ms).to.equal(3 * 60 * 60 * 1000);
+        chai.expect(result.payload.conversationcontext.patterns.fsm.timeout.goto).to.equal('other_state');
+        chai.expect(result.payload.conversationcontext.patterns.fsm.timeout.using).to.equal('foo bar');
       });
   });
 
@@ -357,8 +359,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           },
           unhandled: { action: 'package/action_03' }
         }
@@ -370,10 +372,14 @@ describe('middleware-patterns-fsm', () => {
         patterns: {
           fsm: {
             state: 'foo',
-            since_timestamp: (new Date()).getTime() - (60 * 1000),
-            timeout: 2000,
-            timeout_goto: 'bar',
-            timeout_using: 'foo bar'
+            since: {
+              timestamp: (new Date()).getTime() - (60 * 1000)
+            },
+            timeout:{
+              ms: 2000,
+              goto: 'bar',
+              using: 'foo bar'
+            }
           }
         }
       },
@@ -416,8 +422,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           },
           unhandled: { action: 'package/action_03' }
         }
@@ -429,8 +435,12 @@ describe('middleware-patterns-fsm', () => {
         patterns: {
           fsm: {
             state: 'foo',
-            since_timestamp: (new Date()).getTime() - (60 * 1000),
-            timeout: 2000
+            since: {
+              timestamp: (new Date()).getTime() - (60 * 1000)
+            },
+            timeout: {
+              ms: 2000
+            }
           }
         }
       },
@@ -473,8 +483,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           },
           unhandled: { action: 'package/action_03' }
         }
@@ -529,8 +539,8 @@ describe('middleware-patterns-fsm', () => {
             state: 'bar'
           },
           states: {
-            foo: { action: 'package/action_00' },
-            bar: { action: 'package/action_01' }
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
           }
         }
       }
@@ -547,6 +557,52 @@ describe('middleware-patterns-fsm', () => {
       .catch(result => {
         chai.expect(result.error.message).to.exist;
         chai.expect(result.statusCode).to.equal(503);
+      });
+  });
+
+  it('calls transition actions when entering a state', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 422 }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: 'foo', using: 'lorem ipsum' } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: 'bar'
+          },
+          states: {
+            foo: { handler: { action: 'package/action_00' } },
+            bar: { handler: { action: 'package/action_01' } }
+          },
+          unhandled: { action: 'package/action_03' }
+        }
+      }
+    }
+
+    const payload = { result: 0 }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {
+        chai.expect(result.statusCode).to.equal(200);
+        
+        chai.expect(invokeStub.callCount).to.equal(2);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_01');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_03');
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(0);
+        
+        chai.expect(result.payload.result).to.equal(1);
+        chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
+        chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
       });
   });
 });
