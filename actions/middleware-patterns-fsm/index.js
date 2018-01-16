@@ -349,7 +349,7 @@ const params$validate = (params) => {
 /**
  * Handles the result of the state action, if a state change is required, the transformation context will be configured.
  * 
- * @param {*} params 
+ * @param {*} params
  */
 const state$call$handle_result = (params) => {
   const patternname = params$patternname(params);
@@ -405,7 +405,7 @@ const state$call$handle_result = (params) => {
       });
     }
   } else {
-    const state_goto = _.get(result, 'fsm.goto', state.name);
+    const state_goto = _.get(result, 'fsm.goto');
     const state_using = _.get(result, 'fsm.using', data);
     const state_timeout_ms = _.get(result, 'fsm.timeout.ms');
     const state_timeout_goto = _.get(result, 'fsm.timeout.goto');
@@ -416,12 +416,21 @@ const state$call$handle_result = (params) => {
       _.set(params, 'payload', new_payload);
     }
 
-    params$state$current$name$set(params, patternname, state_goto);
+    params$state$current$name$set(params, patternname, state_goto || state.name);
     params$state$current$since$set(params, patternname, new Date());
     params$state$current$data$set(params, patternname, state_using);
     params$state$current$timeout$ms$set(params, patternname, state_timeout_ms);
     params$state$current$timeout$goto$set(params, patternname, state_timeout_goto);
     params$state$current$timeout$using$set(params, patternname, state_timeout_using);
+
+    if (state_goto) {
+      _.set(params, 'context.transition.from.state', _.assign({ name: state.name }, params$states(params, patternname)[state.name]));
+      _.set(params, 'context.transition.from.data', state_using);
+      _.set(params, 'context.transition.to.state', _.assign({ name: state_goto }, params$states(params, patternname)[state_goto]));
+      _.set(params, 'context.transition.to.data', state_using);
+    } else {
+      _.set(params, 'context.transition', undefined);
+    }
 
     return Promise.resolve(params);
   }
@@ -583,7 +592,7 @@ const state$transition = (params) => {
     }
 
     if (transition_to && _.isObject(transition_to_enter)) {
-      call$transition_from = (params) => {
+      call$transition_to = (params) => {
         _.set(params, 'context.call.action', transition_to_enter);
         _.set(params, 'context.call.parameters', {
           fsm: {
@@ -600,9 +609,9 @@ const state$transition = (params) => {
       }
     }
 
-    if (transition_from_to) {
+    if (transition_from_to && _.isObject(transition_from_to)) {
       call$transition = (params) => {
-        _.set(params, 'context.call.action', transition_from_to);
+        _.set(params, 'context.call.action', transition_from_to.handler);
         _.set(params, 'context.call.parameters', {
           fsm: {
             transition: true

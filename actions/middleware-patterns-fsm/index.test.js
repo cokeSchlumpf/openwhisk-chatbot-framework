@@ -35,11 +35,11 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_01');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('bar');
       });
@@ -76,11 +76,11 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_01');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
         chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
@@ -111,7 +111,7 @@ describe('middleware-patterns-fsm', () => {
       }
     }
 
-    const payload = { 
+    const payload = {
       conversationcontext: {
         patterns: {
           fsm: {
@@ -120,7 +120,7 @@ describe('middleware-patterns-fsm', () => {
           }
         }
       },
-      result: 0 
+      result: 0
     }
 
     requireMock.reRequire('openwhisk');
@@ -128,12 +128,12 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.fsm.data).to.equal('lala');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
         chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
@@ -164,9 +164,9 @@ describe('middleware-patterns-fsm', () => {
       }
     }
 
-    const payload = { 
-      conversationcontext: { },
-      result: 0 
+    const payload = {
+      conversationcontext: {},
+      result: 0
     }
 
     const fsm = {
@@ -179,12 +179,12 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload, fsm })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.fsm.data).to.equal('lala');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.fsm.state).to.equal('foo');
         chai.expect(result.fsm.data).to.equal('lorem ipsum');
@@ -224,13 +224,13 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(2);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_01');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
         chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_03');
         chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
       });
   });
@@ -268,13 +268,13 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(2);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_01');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
         chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_03');
         chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
         chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
@@ -284,15 +284,17 @@ describe('middleware-patterns-fsm', () => {
   it('accepts timeout commands for the next state', () => {
     const invokeStub = sinon.stub()
       .onCall(0).returns(Promise.resolve({ statusCode: 422 }))
-      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { 
-        goto: 'foo', 
-        using: 'lorem ipsum',
-        timeout: {
-          ms: 3 * 60 * 60 * 1000,
-          goto: 'other_state',
-          using: 'foo bar'
+      .onCall(1).returns(Promise.resolve({
+        statusCode: 200, payload: { result: 1 }, fsm: {
+          goto: 'foo',
+          using: 'lorem ipsum',
+          timeout: {
+            ms: 3 * 60 * 60 * 1000,
+            goto: 'other_state',
+            using: 'foo bar'
+          }
         }
-      } }));
+      }));
 
     requireMock('openwhisk', () => ({
       actions: {
@@ -322,13 +324,13 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(2);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_01');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
         chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_03');
         chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
         chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
@@ -341,10 +343,12 @@ describe('middleware-patterns-fsm', () => {
 
   it('may jump to another defined timeout state, if the timeout is reached', () => {
     const invokeStub = sinon.stub()
-      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { 
-        goto: 'foo', 
-        using: 'lorem ipsum'
-      } }));
+      .onCall(0).returns(Promise.resolve({
+        statusCode: 200, payload: { result: 1 }, fsm: {
+          goto: 'foo',
+          using: 'lorem ipsum'
+        }
+      }));
 
     requireMock('openwhisk', () => ({
       actions: {
@@ -367,7 +371,7 @@ describe('middleware-patterns-fsm', () => {
       }
     }
 
-    const payload = { 
+    const payload = {
       conversationcontext: {
         patterns: {
           fsm: {
@@ -375,7 +379,7 @@ describe('middleware-patterns-fsm', () => {
             since: {
               timestamp: (new Date()).getTime() - (60 * 1000)
             },
-            timeout:{
+            timeout: {
               ms: 2000,
               goto: 'bar',
               using: 'foo bar'
@@ -383,7 +387,7 @@ describe('middleware-patterns-fsm', () => {
           }
         }
       },
-      result: 0 
+      result: 0
     }
 
     requireMock.reRequire('openwhisk');
@@ -391,11 +395,11 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_01');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
         chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
@@ -404,10 +408,12 @@ describe('middleware-patterns-fsm', () => {
 
   it('may jump to the initial state, if the timeout is reached', () => {
     const invokeStub = sinon.stub()
-      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { 
-        goto: 'foo', 
-        using: 'lorem ipsum'
-      } }));
+      .onCall(0).returns(Promise.resolve({
+        statusCode: 200, payload: { result: 1 }, fsm: {
+          goto: 'foo',
+          using: 'lorem ipsum'
+        }
+      }));
 
     requireMock('openwhisk', () => ({
       actions: {
@@ -430,7 +436,7 @@ describe('middleware-patterns-fsm', () => {
       }
     }
 
-    const payload = { 
+    const payload = {
       conversationcontext: {
         patterns: {
           fsm: {
@@ -444,7 +450,7 @@ describe('middleware-patterns-fsm', () => {
           }
         }
       },
-      result: 0 
+      result: 0
     }
 
     requireMock.reRequire('openwhisk');
@@ -452,11 +458,11 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_01');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
         chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
@@ -465,10 +471,12 @@ describe('middleware-patterns-fsm', () => {
 
   it('does not jump to the timeout_action if timeout is not reached', () => {
     const invokeStub = sinon.stub()
-      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { 
-        goto: 'foo', 
-        using: 'lorem ipsum'
-      } }));
+      .onCall(0).returns(Promise.resolve({
+        statusCode: 200, payload: { result: 1 }, fsm: {
+          goto: 'foo',
+          using: 'lorem ipsum'
+        }
+      }));
 
     requireMock('openwhisk', () => ({
       actions: {
@@ -491,7 +499,7 @@ describe('middleware-patterns-fsm', () => {
       }
     }
 
-    const payload = { 
+    const payload = {
       conversationcontext: {
         patterns: {
           fsm: {
@@ -503,7 +511,7 @@ describe('middleware-patterns-fsm', () => {
           }
         }
       },
-      result: 0 
+      result: 0
     }
 
     requireMock.reRequire('openwhisk');
@@ -511,11 +519,11 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(1);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
         chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
@@ -593,16 +601,216 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        
+
         chai.expect(invokeStub.callCount).to.equal(2);
         chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_01');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
         chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_03');
         chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(0);
-        
+
         chai.expect(result.payload.result).to.equal(1);
         chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('foo');
         chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
       });
   });
+
+  it('executes the action defined for the initial state and the enter action, if no state is active yet', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 2 } }))
+      .onCall(2).returns(Promise.resolve({ statusCode: 200, payload: { result: 3 } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: 'bar'
+          },
+          states: {
+            foo: { handler: { action: 'package/action_00' } },
+            bar: {
+              enter: { action: 'package/action_02' },
+              handler: { action: 'package/action_01' }
+            }
+          }
+        }
+      }
+    }
+
+    const payload = { result: 0 }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {
+        chai.expect(result.statusCode).to.equal(200);
+
+        chai.expect(invokeStub.callCount).to.equal(2);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_02');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_01');
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(1);
+
+        chai.expect(result.payload.result).to.equal(2);
+        chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('bar');
+      });
+  });
+
+  it('calls enter and exit actions when changing the state', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: 'lorem', using: 'lorem ipsum' } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 2 } }))
+      .onCall(2).returns(Promise.resolve({ statusCode: 200, payload: { result: 3 } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: 'bar'
+          },
+          states: {
+            foo: {
+              handler: { action: 'package/action_00' },
+              exit: { action: 'package/action_05' }
+            },
+            bar: {
+              enter: { action: 'package/action_02' },
+              handler: { action: 'package/action_01' }
+            },
+            lorem: {
+              enter: { action: 'package/action_03' },
+              handler: { action: 'package/action_04' }
+            }
+          }
+        }
+      }
+    }
+
+    const payload = {
+      conversationcontext: {
+        patterns: {
+          fsm: {
+            state: 'foo',
+            data: 'lala'
+          }
+        }
+      },
+      result: 0
+    }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {
+        chai.expect(result.statusCode).to.equal(200);
+        chai.expect(result.payload.result).to.equal(3);
+
+        chai.expect(invokeStub.callCount).to.equal(3);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
+        chai.expect(invokeStub.getCall(0).args[0].params.fsm.data).to.equal('lala');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.conversationcontext.patterns.fsm.state).to.equal('lorem');
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
+
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_05');
+        chai.expect(invokeStub.getCall(2).args[0].name).to.equal('package/action_03');
+      });
+  });
+
+  it('additionally calls transitions when defined', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: 'lorem', using: 'lorem ipsum' } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 2 } }))
+      .onCall(2).returns(Promise.resolve({ statusCode: 200, payload: { result: 3 } }))
+      .onCall(3).returns(Promise.resolve({ statusCode: 200, payload: { result: 4 } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: 'bar'
+          },
+          states: {
+            foo: {
+              handler: { action: 'package/action_00' },
+              exit: { action: 'package/action_05' }
+            },
+            bar: {
+              enter: { action: 'package/action_02' },
+              handler: { action: 'package/action_01' }
+            },
+            lorem: {
+              enter: { action: 'package/action_03' },
+              handler: { action: 'package/action_04' }
+            }
+          },
+          transitions: [
+            {
+              from: 'foo',
+              to: 'lorem',
+              handler: {
+                action: 'package/action_06'
+              }
+            }
+          ]
+        }
+      }
+    }
+
+    const payload = {
+      conversationcontext: {
+        patterns: {
+          fsm: {
+            state: 'foo',
+            data: 'lala'
+          }
+        }
+      },
+      result: 0
+    }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {
+        chai.expect(result.statusCode).to.equal(200);
+        chai.expect(result.payload.result).to.equal(4);
+
+        chai.expect(invokeStub.callCount).to.equal(4);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_00');
+        chai.expect(invokeStub.getCall(0).args[0].params.fsm.data).to.equal('lala');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.conversationcontext.patterns.fsm.state).to.equal('lorem');
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
+
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_05');
+        chai.expect(invokeStub.getCall(2).args[0].name).to.equal('package/action_06');
+        chai.expect(invokeStub.getCall(3).args[0].name).to.equal('package/action_03');
+      });
+  });
 });
+
+console.log(require('path').normalize('/..'));
+console.log(require('path').normalize('/hallo/..'));
+console.log(require('path').normalize('hallo/..'));
+console.log(require('path').normalize('hallo/fo/pla/..'));
