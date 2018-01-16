@@ -866,4 +866,6 @@ describe('middleware-patterns-fsm', () => {
         chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(0);
       });
   });
+
+  // Add implementatio + tests for transitions in hierarchies? Will not be implmented before it is required.
 });
