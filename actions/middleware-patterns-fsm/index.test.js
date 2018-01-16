@@ -808,9 +808,62 @@ describe('middleware-patterns-fsm', () => {
         chai.expect(invokeStub.getCall(3).args[0].name).to.equal('package/action_03');
       });
   });
-});
 
-console.log(require('path').normalize('/..'));
-console.log(require('path').normalize('/hallo/..'));
-console.log(require('path').normalize('hallo/..'));
-console.log(require('path').normalize('hallo/fo/pla/..'));
+  it('can be used as hierarchical state machine', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 422 }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: '/b/a', using: 'lorem ipsum' } }))
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: '/b'
+          },
+          states: {
+            '/b': { handler: { action: 'package/action_00' } },
+            '/b/a': { handler: { action: 'package/action_01' } },
+            '/b/b': { handler: { action: 'package/action_02' } },
+          }
+        }
+      }
+    }
+
+    const payload = {
+      conversationcontext: {
+        patterns: {
+          fsm: {
+            state: '/b/b',
+            data: 'lala'
+          }
+        }
+      },
+      result: 0
+    }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {
+        chai.expect(result.statusCode).to.equal(200);
+        chai.expect(result.payload.result).to.equal(1);
+        chai.expect(result.payload.conversationcontext.patterns.fsm.state).to.equal('/b/a');
+        chai.expect(result.payload.conversationcontext.patterns.fsm.data).to.equal('lorem ipsum');
+
+        chai.expect(invokeStub.callCount).to.equal(2);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_02');
+        chai.expect(invokeStub.getCall(0).args[0].params.fsm.data).to.equal('lala');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_00');
+        chai.expect(invokeStub.getCall(1).args[0].params.fsm.data).to.equal('lala');
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(0);
+      });
+  });
+});

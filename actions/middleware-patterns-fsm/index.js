@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const openwhisk = require('openwhisk');
+const path = require('path');
 
 const DEFAULT_PATTERN_NAME = 'fsm';
 
@@ -357,7 +358,7 @@ const state$call$handle_result = (params) => {
   const action = _.get(params, 'context.call.action', {});
   const statusCode = _.get(params, 'context.call.result.statusCode', 503);
   const result = _.get(params, 'context.call.result', {});
-  const unhandled = _.get(params, 'context.state.unhandled', false)
+  const unhandled = _.get(params, 'context.state.unhandled', false);
 
   const state = _.get(params, 'context.state.state', {});
   const data = _.get(params, 'context.state.data', {});
@@ -386,23 +387,46 @@ const state$call$handle_result = (params) => {
       }
     });
   } else if (statusCode < 200 || statusCode > 299) {
-    const action = params$unhandled(params, patternname);
+    const last_state_name = _.get(params, 'context.state.parent', state.name);
+    const parent = path.normalize(`${last_state_name}/..`)
+    const unhandled_action = params$unhandled(params, patternname);
 
-    if (action) {
-      _.set(params, 'context.call.action', action);
-      _.set(params, 'context.state.unhandled', true);
+    if (_.isEqual(parent, '/') || _.isEqual(parent, '.')) { // no hierarchy or root reached.
+      if (unhandled_action) {
+        _.set(params, 'context.call.action', unhandled_action);
+        _.set(params, 'context.state.unhandled', true);
 
-      return Promise.resolve(params)
-        .then(action$normalize)
-        .then(action$call)
-        .then(state$call$handle_result);
+        return Promise.resolve(params)
+          .then(action$normalize)
+          .then(action$call)
+          .then(state$call$handle_result);
+      } else {
+        return Promise.reject({
+          statusCode: 503,
+          error: {
+            message: `Didn't handle current payload in state '${state.name}' and no handler defined in 'config.patterns.${patternname}.unhandled'.`
+          }
+        });
+      }
     } else {
-      return Promise.reject({
-        statusCode: 503,
-        error: {
-          message: `Didn't handle current payload in state '${state.name}' and no handler defined in 'config.patterns.${patternname}.unhandled'.`
-        }
-      });
+      const parent_state = params$states(params, patternname)[parent];
+
+      if (parent_state) {
+        _.set(params, 'context.call.action', parent_state.handler);
+        _.set(params, 'context.state.parent', parent);
+
+        return Promise.resolve(params)
+          .then(action$normalize)
+          .then(action$call)
+          .then(state$call$handle_result);
+      } else {
+        return Promise.reject({
+          statusCode: 503,
+          error: {
+            message: `The current hierarchical state '${state.name}' didn't handle the payload and the parent state '${parent}' is not defined in 'config.patterns.${patternname}.states'.`
+          }
+        });
+      }
     }
   } else {
     const state_goto = _.get(result, 'fsm.goto');
@@ -507,7 +531,7 @@ const state$init = (params) => {
     _.set(params, 'context.state', state);
   } else {
     state = {
-      state: _.assign({ name: current_state }, params$states(params, patternname)[current_state]),
+      state: _.assign({ name: current_state }, _.get(params$states(params, patternname), current_state, {})),
       data: current_data
     }
 
