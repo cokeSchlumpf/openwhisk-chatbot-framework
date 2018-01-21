@@ -6,7 +6,7 @@
   "description": "A middleware which acts as a state machine for a conversation",
   "main": "index.js",
   "scripts": {
-    "test": "mocha *.test.js"
+    "test": "NODEENV=test mocha *.test.js"
   },
   "dependencies": {
     "lodash": "^4.17.4",

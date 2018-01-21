@@ -923,10 +923,14 @@ describe('middleware-patterns-fsm', () => {
 
   it('calls enter and exit actions also for parent actions when using hierarchies', () => {
     const invokeStub = sinon.stub()
-      .onCall(0).returns(Promise.resolve({ statusCode: 422 }))
-      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: '/a/y/z', using: 'lorem ipsum' } }))
-      .onCall(2).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: '/a/y/z', using: 'lorem ipsum' } }))
-      .onCall(3).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: '/a/y/z', using: 'lorem ipsum' } }));
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 2 } }))
+      .onCall(2).returns(Promise.resolve({ statusCode: 200, payload: { result: 3 }, fsm: { goto: '/a/y/z', using: 'lorem ipsum' } }))
+      .onCall(3).returns(Promise.resolve({ statusCode: 200, payload: { result: 4 } }))
+      .onCall(4).returns(Promise.resolve({ statusCode: 200, payload: { result: 5 } }))
+      .onCall(5).returns(Promise.resolve({ statusCode: 200, payload: { result: 6 } }))
+      .onCall(6).returns(Promise.resolve({ statusCode: 200, payload: { result: 7 } }))
+      .onCall(7).returns(Promise.resolve({ statusCode: 200, payload: { result: 8 } }));
 
     requireMock('openwhisk', () => ({
       actions: {
@@ -941,13 +945,18 @@ describe('middleware-patterns-fsm', () => {
             state: '/a/b/c'
           },
           states: {
-            '/a': { handler: { action: 'package/action_a' } },
+            '/a': { 
+              handler: { action: 'package/action_a' },
+              enter: { action: 'package/action_a_enter' },
+              exit: { action: 'package/action_a_exit' }
+            },
             '/a/b': { 
               handler: { action: 'package/action_b' },
               exit: { action: 'package/action_b_exit' }
             },
             '/a/b/c': { 
               handler: { action: 'package/action_c' },
+              enter: { action: 'package/action_c_enter' },
               exit: { action: 'package/action_c_exit' }
             },
             '/a/y': { 
@@ -972,17 +981,151 @@ describe('middleware-patterns-fsm', () => {
     return requireMock.reRequire('./index').main({ config, payload })
       .then(result => {
         chai.expect(result.statusCode).to.equal(200);
-        chai.expect(invokeStub.callCount).to.equal(4);
-        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_c');        
+        // chai.expect(invokeStub.callCount).to.equal(4);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_a_enter');
         chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+
+        chai.expect(invokeStub.getCall(1).args[0].name).to.equal('package/action_c_enter');
+        chai.expect(invokeStub.getCall(1).args[0].params.payload.result).to.equal(1);
+
+        chai.expect(invokeStub.getCall(2).args[0].name).to.equal('package/action_c');
+        chai.expect(invokeStub.getCall(2).args[0].params.payload.result).to.equal(2);
+
+        chai.expect(invokeStub.getCall(3).args[0].name).to.equal('package/action_c_exit');
+        chai.expect(invokeStub.getCall(3).args[0].params.payload.result).to.equal(3);
+
+        chai.expect(invokeStub.getCall(4).args[0].name).to.equal('package/action_b_exit');
+        chai.expect(invokeStub.getCall(4).args[0].params.payload.result).to.equal(4);
+
+        chai.expect(invokeStub.getCall(5).args[0].name).to.equal('package/action_y_enter');
+        chai.expect(invokeStub.getCall(5).args[0].params.payload.result).to.equal(5);
+
+        chai.expect(invokeStub.getCall(6).args[0].name).to.equal('package/action_z_enter');
+        chai.expect(invokeStub.getCall(6).args[0].params.payload.result).to.equal(6);
+      });
+  });
+
+  it('returns an error if one of the enter or exit actions returns an error', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 } }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 500, payload: { result: 2 } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: '/a/b/c'
+          },
+          states: {
+            '/a': { 
+              handler: { action: 'package/action_a' },
+              enter: { action: 'package/action_a_enter' },
+              exit: { action: 'package/action_a_exit' }
+            },
+            '/a/b': { 
+              handler: { action: 'package/action_b' },
+              exit: { action: 'package/action_b_exit' }
+            },
+            '/a/b/c': { 
+              handler: { action: 'package/action_c' },
+              enter: { action: 'package/action_c_enter' },
+              exit: { action: 'package/action_c_exit' }
+            },
+            '/a/y': { 
+              handler: { action: 'package/action_y' },
+              enter: { action: 'package/action_y_enter' }
+            },
+            '/a/y/z': { 
+              handler: { action: 'package/action_z' },
+              enter: { action: 'package/action_z_enter' }
+            }
+          }
+        }
+      }
+    }
+
+    const payload = {
+      result: 0
+    }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {
+        chai.expect(true).to.be.false;
+      })
+      .catch(result => {
+        chai.expect(result.statusCode).to.equal(500);
+        chai.expect(result.error.message).to.exist;
+      });
+  });
+
+  it('returns an error if one of the enter or exit actions throws an exception', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 } }))
+      .onCall(1).throws('An error');
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: '/a/b/c'
+          },
+          states: {
+            '/a': { 
+              handler: { action: 'package/action_a' },
+              enter: { action: 'package/action_a_enter' },
+              exit: { action: 'package/action_a_exit' }
+            },
+            '/a/b': { 
+              handler: { action: 'package/action_b' },
+              exit: { action: 'package/action_b_exit' }
+            },
+            '/a/b/c': { 
+              handler: { action: 'package/action_c' },
+              enter: { action: 'package/action_c_enter' },
+              exit: { action: 'package/action_c_exit' }
+            },
+            '/a/y': { 
+              handler: { action: 'package/action_y' },
+              enter: { action: 'package/action_y_enter' }
+            },
+            '/a/y/z': { 
+              handler: { action: 'package/action_z' },
+              enter: { action: 'package/action_z_enter' }
+            }
+          }
+        }
+      }
+    }
+
+    const payload = {
+      result: 0
+    }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {
+        chai.expect(true).to.be.false;
+      })
+      .catch(result => {
+        chai.expect(result.statusCode).to.equal(500);
+        chai.expect(result.error.message).to.exist;
       });
   });
 });
 
-console.log(require('path').relative('/foo/bar/lorem', '/foo/bla/blum'));
-console.log(require('path').relative('/foo/bla/blum', '/foo/bar/lorem'));
-
-// Von undefined to bar
-console.log(require('path').relative('/', '/bar'));
-console.log('***');
-console.log(require('path').relative('/bar', '/'));
+console.log(require('path').relative('/a/b/c', '/a/y/z'));

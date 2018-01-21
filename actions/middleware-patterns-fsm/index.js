@@ -586,11 +586,9 @@ const state$transition = (params) => {
     const states = params$states(params, patternname);
 
     const transition_from = _.get(transition, 'from.state.name');
-    const transition_from_exit = _.get(transition, 'from.state.exit');
     const transition_from_data = _.get(transition, 'from.data', {});
 
     const transition_to = _.get(transition, 'to.state.name');
-    const transition_to_enter = _.get(transition, 'to.state.enter');
     const transition_to_data = _.get(transition, 'to.data');
     const transition_from_to = _.find(transitions, { from: transition_from, to: transition_to });
 
@@ -598,65 +596,105 @@ const state$transition = (params) => {
     let call$transition_to = (params) => Promise.resolve(params);
     let call$transition = (params) => Promise.resolve(params);
 
-    if (transition_from && _.isObject(transition_from_exit)) {
-      call$transition_from = (params) => {
-        _.set(params, 'context.call.action', transition_from_exit);
-        _.set(params, 'context.call.parameters', {
-          fsm: {
-            transition: true,
-            exit: true,
-            data: transition_from_data
-          }
-        });
+    if (transition_from) {
+      const relative_path = path.relative(`/${transition_to}`, `/${transition_from}`)
 
-        return Promise.resolve(params)
-          .then(action$normalize)
-          .then(action$call)
-          .then(state$transition$handle_result)
-      }
+      const absolute_path_splitted = _.chain(transition_from).split('/').tail().value();
+
+      const common_base_bath = '/' + _
+        .chain(relative_path)
+        .split('/')
+        .tail()
+        .filter(v => _.isEqual(v, '..'))
+        .map((v, i) => absolute_path_splitted[i])
+        .join('/')
+        .value();
+
+      call$transition_from = (params) => _
+        .chain(relative_path)
+        .split('/')
+        .filter(v => {
+          return !_.isEqual(v, '..') && !_.isUndefined(v) && !_.isEqual(v, 'undefined') && _.size(v) > 0
+        })
+        .reduce((acc, v) => _.concat(acc, (_.last(acc) || '') + '/' + v), [])
+        .reverse()
+        .map(state_name => path.normalize(common_base_bath + state_name))
+        .map(state_name => {
+          const state_name_nopath = state_name.substring(1);
+          const exit_action = _.get(states, `${state_name}.exit`, _.get(states, `${state_name_nopath}.exit`))
+
+          if (exit_action) {
+            return (params) => {
+              _.set(params, 'context.call.action', exit_action);
+              _.set(params, 'context.call.parameters', {
+                fsm: {
+                  transition: true,
+                  exit: true,
+                  data: transition_to_data
+                }
+              });
+
+              return Promise.resolve(params)
+                .then(action$normalize)
+                .then(action$call)
+                .then(state$transition$handle_result);
+            }
+          } else {
+            return (params) => Promise.resolve(params);
+          }
+        })
+        .reduce((acc, promise) => acc.then(promise), Promise.resolve(params))
+        .value();
     }
 
     if (transition_to) {
-      call$transition_to = (params) => {
-        const calls = _
-          .chain(path.resolve(`/${transition_to}`, `/${transition_from}`))
-          .split('/')
-          .filter(v => !_.isEqual(v, '..') && !_.isUndefined(v) && !_.isEqual(v, 'undefined') && _.size(v) > 0)
-          .reduce((acc, v) => _.concat(acc, (_.last(acc) || '') + '/' + v), [])
-          .map(state_name => {
-            const state_name_nopath = state_name.substring(1);
-            const enter_action = _.get(states, `${state_name}.enter`, _.get(states, `${state_name_nopath}.enter`))
-            
-            console.log(state_name);
+      const relative_path = path.relative(`/${transition_from}`, `/${transition_to}`)
 
-            if (enter_action) {
-              console.log('... has enter action');
-              console.log(JSON.stringify(enter_action, null, 2));
-              
-              return (params) => {
-                _.set(params, 'context.call.action', enter_action);
-                _.set(params, 'context.call.parameters', {
-                  fsm: {
-                    transition: true,
-                    enter: true,
-                    data: transition_to_data
-                  }
-                });
+      const absolute_path_splitted = _.chain(transition_to).split('/').tail().value();
 
-                return Promise.resolve(params)
-                  .then(action$normalize)
-                  .then(action$call)
-                  .then(state$transition$handle_result);
-              }
-            } else {
-              return (params) => Promise.resolve(params);
+      const common_base_bath = '/' + _
+        .chain(relative_path)
+        .split('/')
+        .tail()
+        .filter(v => _.isEqual(v, '..'))
+        .map((v, i) => absolute_path_splitted[i])
+        .join('/')
+        .value();
+
+      call$transition_to = (params) => _
+        .chain(relative_path)
+        .split('/')
+        .filter(v => {
+          return !_.isEqual(v, '..') && !_.isUndefined(v) && !_.isEqual(v, 'undefined') && _.size(v) > 0
+        })
+        .reduce((acc, v) => _.concat(acc, (_.last(acc) || '') + '/' + v), [])
+        .map(state_name => path.normalize(common_base_bath + state_name))
+        .map(state_name => {
+          const state_name_nopath = state_name.substring(1);
+          const enter_action = _.get(states, `${state_name}.enter`, _.get(states, `${state_name_nopath}.enter`))
+
+          if (enter_action) {
+            return (params) => {
+              _.set(params, 'context.call.action', enter_action);
+              _.set(params, 'context.call.parameters', {
+                fsm: {
+                  transition: true,
+                  enter: true,
+                  data: transition_to_data
+                }
+              });
+
+              return Promise.resolve(params)
+                .then(action$normalize)
+                .then(action$call)
+                .then(state$transition$handle_result);
             }
-          })
-          .reduce((acc, promise) => acc.then(promise), Promise.resolve(params))
-          .value();
-          
-        return calls;
-      }
+          } else {
+            return (params) => Promise.resolve(params);
+          }
+        })
+        .reduce((acc, promise) => acc.then(promise), Promise.resolve(params))
+        .value();
     }
 
     if (transition_from_to && _.isObject(transition_from_to)) {
