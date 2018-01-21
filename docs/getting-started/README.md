@@ -1,4 +1,4 @@
-# Basics
+# Getting Started
 
 Building simple chatbots is quite easy; building complex chatbots with many integrations, channels and services is harder. But don't be fooled - Getting started with OpenWhisk Chatbot Framework is incredibly simple, even though it enables you to extend your chatbot with many functions easily. 
 
