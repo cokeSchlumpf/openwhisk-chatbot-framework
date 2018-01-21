@@ -867,5 +867,122 @@ describe('middleware-patterns-fsm', () => {
       });
   });
 
-  // Add implementatio + tests for transitions in hierarchies? Will not be implmented before it is required.
+  it('does not allow missing parent states, when using hierarchical states', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 422 }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: '/b/a', using: 'lorem ipsum' } }))
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: '/b'
+          },
+          states: {
+            '/b': { handler: { action: 'package/action_00' } },
+            '/b/a': { handler: { action: 'package/action_01' } },
+            '/b/b/c': { handler: { action: 'package/action_02' } },
+          }
+        }
+      }
+    }
+
+    const payload = {
+      conversationcontext: {
+        patterns: {
+          fsm: {
+            state: '/b/b/c',
+            data: 'lala'
+          }
+        }
+      },
+      result: 0
+    }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {
+        chai.expect(true).to.be.false;
+      })
+      .catch(result => {
+        chai.expect(result.statusCode).to.equal(503);
+        chai.expect(invokeStub.callCount).to.equal(1);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_02');
+        chai.expect(invokeStub.getCall(0).args[0].params.fsm.data).to.equal('lala');
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+        chai.expect(result.error.message).to.exist;
+      });
+  });
+
+  it('calls enter and exit actions also for parent actions when using hierarchies', () => {
+    const invokeStub = sinon.stub()
+      .onCall(0).returns(Promise.resolve({ statusCode: 422 }))
+      .onCall(1).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: '/a/y/z', using: 'lorem ipsum' } }))
+      .onCall(2).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: '/a/y/z', using: 'lorem ipsum' } }))
+      .onCall(3).returns(Promise.resolve({ statusCode: 200, payload: { result: 1 }, fsm: { goto: '/a/y/z', using: 'lorem ipsum' } }));
+
+    requireMock('openwhisk', () => ({
+      actions: {
+        invoke: invokeStub
+      }
+    }));
+
+    const config = {
+      patterns: {
+        fsm: {
+          initial: {
+            state: '/a/b/c'
+          },
+          states: {
+            '/a': { handler: { action: 'package/action_a' } },
+            '/a/b': { 
+              handler: { action: 'package/action_b' },
+              exit: { action: 'package/action_b_exit' }
+            },
+            '/a/b/c': { 
+              handler: { action: 'package/action_c' },
+              exit: { action: 'package/action_c_exit' }
+            },
+            '/a/y': { 
+              handler: { action: 'package/action_y' },
+              enter: { action: 'package/action_y_enter' }
+            },
+            '/a/y/z': { 
+              handler: { action: 'package/action_z' },
+              enter: { action: 'package/action_z_enter' }
+            }
+          }
+        }
+      }
+    }
+
+    const payload = {
+      result: 0
+    }
+
+    requireMock.reRequire('openwhisk');
+
+    return requireMock.reRequire('./index').main({ config, payload })
+      .then(result => {
+        chai.expect(result.statusCode).to.equal(200);
+        chai.expect(invokeStub.callCount).to.equal(4);
+        chai.expect(invokeStub.getCall(0).args[0].name).to.equal('package/action_c');        
+        chai.expect(invokeStub.getCall(0).args[0].params.payload.result).to.equal(0);
+      });
+  });
 });
+
+console.log(require('path').relative('/foo/bar/lorem', '/foo/bla/blum'));
+console.log(require('path').relative('/foo/bla/blum', '/foo/bar/lorem'));
+
+// Von undefined to bar
+console.log(require('path').relative('/', '/bar'));
+console.log('***');
+console.log(require('path').relative('/bar', '/'));

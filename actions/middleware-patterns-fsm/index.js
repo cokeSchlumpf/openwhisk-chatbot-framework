@@ -583,6 +583,7 @@ const state$transition = (params) => {
   if (transition) {
     const patternname = params$patternname(params);
     const transitions = params$transitions(params, patternname);
+    const states = params$states(params, patternname);
 
     const transition_from = _.get(transition, 'from.state.name');
     const transition_from_exit = _.get(transition, 'from.state.exit');
@@ -615,21 +616,46 @@ const state$transition = (params) => {
       }
     }
 
-    if (transition_to && _.isObject(transition_to_enter)) {
+    if (transition_to) {
       call$transition_to = (params) => {
-        _.set(params, 'context.call.action', transition_to_enter);
-        _.set(params, 'context.call.parameters', {
-          fsm: {
-            transition: true,
-            enter: true,
-            data: transition_to_data
-          }
-        });
+        const calls = _
+          .chain(path.resolve(`/${transition_to}`, `/${transition_from}`))
+          .split('/')
+          .filter(v => !_.isEqual(v, '..') && !_.isUndefined(v) && !_.isEqual(v, 'undefined') && _.size(v) > 0)
+          .reduce((acc, v) => _.concat(acc, (_.last(acc) || '') + '/' + v), [])
+          .map(state_name => {
+            const state_name_nopath = state_name.substring(1);
+            const enter_action = _.get(states, `${state_name}.enter`, _.get(states, `${state_name_nopath}.enter`))
+            
+            console.log(state_name);
 
-        return Promise.resolve(params)
-          .then(action$normalize)
-          .then(action$call)
-          .then(state$transition$handle_result);
+            if (enter_action) {
+              console.log('... has enter action');
+              console.log(JSON.stringify(enter_action, null, 2));
+              
+              return (params) => {
+                _.set(params, 'context.call.action', enter_action);
+                _.set(params, 'context.call.parameters', {
+                  fsm: {
+                    transition: true,
+                    enter: true,
+                    data: transition_to_data
+                  }
+                });
+
+                return Promise.resolve(params)
+                  .then(action$normalize)
+                  .then(action$call)
+                  .then(state$transition$handle_result);
+              }
+            } else {
+              return (params) => Promise.resolve(params);
+            }
+          })
+          .reduce((acc, promise) => acc.then(promise), Promise.resolve(params))
+          .value();
+          
+        return calls;
       }
     }
 
