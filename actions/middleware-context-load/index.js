@@ -30,7 +30,7 @@ const context$load = (params) => {
   return db.find({
     selector: {
       type: 'conversationcontext',
-      user: _.get(params, 'payload.conversationcontext.user._id')
+      user: _.get(params, 'payload.conversationcontext.user._id', 'not_set')
     },
     limit: 1
   }).catch((error = {}) => {
@@ -56,23 +56,13 @@ const context$load = (params) => {
 }
 
 const validate = (params) => {
-  if (_.isUndefined(_.get(params, 'payload.conversationcontext.user._id'))) {
-    return Promise.reject({
-      message: 'The required parameter `payload.conversationcontext.user._id` is not set'
-    });
-  }
-
   return Promise.resolve(params);
 }
 
 exports.main = (params) => {
-  if (!_.isUndefined(_.get(params, 'payload.conversationcontext.user._id'))) {
-    return Promise.resolve(params)
-      .then(validate)
-      .then(context$load)
-      .then(finalize)
-      .catch(error(params));
-  } else {
-    return Promise.resolve(params);
-  }
+  return Promise.resolve(params)
+    .then(validate)
+    .then(context$load)
+    .then(finalize)
+    .catch(error(params));
 }
