@@ -2,7 +2,7 @@ const _ = require('lodash');
 const rp = require('request-promise');
 
 exports.main = (params) => {
-  const user = params.user;
+  const user = _.get(params, 'payload.conversationcontext.user');
   const accessToken = _.get(params, 'config.facebook.access_token');
 
   const options = {

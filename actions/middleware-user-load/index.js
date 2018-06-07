@@ -44,9 +44,21 @@ const user$new = (params) => {
   if (handlers[channel]) {
     const ow = openwhisk();
     const handler = handlers[channel];
+    
+    let action_name = handler.action;
+
+    if (action_name.indexOf("/") < 0) {
+      const ow_package = _.get(params, 'config.openwhisk.package', _
+        .chain(process)
+        .get('env.__OW_ACTION_NAME', '/././.')
+        .split('/')
+        .nth(-2)
+        .value());
+      action_name = `${ow_package}/${action_name}`
+    }
 
     const invokeParameters = {
-      name: handler.action,
+      name: action_name,
       blocking: true,
       result: true,
       params: _.assign(
@@ -73,7 +85,7 @@ const user$new = (params) => {
         return Promise.reject({
           statusCode: 503,
           error: {
-            message: `error calling action ${handler.action}`,
+            message: `error calling action ${action_name}`,
             params: {
               cause: error,
               handler: handler
