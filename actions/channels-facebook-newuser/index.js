@@ -16,16 +16,16 @@ exports.main = (params) => {
     json: true 
   };
 
-  _.set(params, 'payload.conversationcontext.user', _.assign(user, {
-    first_name,
-    last_name,
-    locale,
-    timezone,
-    gender
-  }));
-
   return rp(options)
     .then(({ first_name, last_name, profile_pic, locale, timezone, gender }) => {
+      _.set(params, 'payload.conversationcontext.user', _.assign(user, {
+        first_name,
+        last_name,
+        locale,
+        timezone,
+        gender
+      }));
+      
       return {
         statusCode: 200,
         payload: params.payload
