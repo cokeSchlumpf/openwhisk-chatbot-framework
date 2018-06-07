@@ -66,9 +66,13 @@ const validate = (params) => {
 }
 
 exports.main = (params) => {
-  return Promise.resolve(params)
-    .then(validate)
-    .then(context$load)
-    .then(finalize)
-    .catch(error(params));
+  if (!_.isUndefined(_.get(params, 'payload.conversationcontext.user._id'))) {
+    return Promise.resolve(params)
+      .then(validate)
+      .then(context$load)
+      .then(finalize)
+      .catch(error(params));
+  } else {
+    return Promise.resolve(params);
+  }
 }
