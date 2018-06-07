@@ -37,8 +37,8 @@ describe('channels-facebook.newuser', () => {
         chai.expect(requestStub.getCall(0).args[0].uri).to.contain('1234');
         chai.expect(requestStub.getCall(0).args[0].qs.access_token).to.contain('foobar');
 
-        chai.expect(result.user.first_name).to.equal('Peter');
-        chai.expect(result.user.last_name).to.equal('Chang');
+        chai.expect(result.payload.conversationcontext.user.first_name).to.equal('Peter');
+        chai.expect(result.payload.conversationcontext.user.last_name).to.equal('Chang');
       });
   });
 });
